@@ -1,0 +1,108 @@
+[
+  {
+    "Id": 1,
+    "moduleId": 1,
+    "title": "Course Introduction",
+    "content": "Welcome to Web Development Fundamentals! In this course, you'll learn the essential building blocks of modern web development.",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "resources": [
+      {
+        "title": "Course Syllabus",
+        "url": "https://example.com/syllabus.pdf",
+        "type": "pdf"
+      },
+      {
+        "title": "Development Environment Setup",
+        "url": "https://example.com/setup-guide",
+        "type": "link"
+      }
+    ],
+    "faq": [
+      {
+        "question": "What prerequisites are needed?",
+        "answer": "No prior experience is required. We'll start from the basics and build up your skills progressively."
+      },
+      {
+        "question": "How long will this course take?",
+        "answer": "The course is designed to be completed in 6-8 weeks with 5-10 hours of study per week."
+      }
+    ],
+    "requiresSubmission": false,
+    "orderIndex": 1,
+    "status": "published"
+  },
+  {
+    "Id": 2,
+    "moduleId": 1,
+    "title": "Development Environment Setup",
+    "content": "Learn how to set up your development environment with VS Code, browser developer tools, and essential extensions.",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "resources": [
+      {
+        "title": "VS Code Download",
+        "url": "https://code.visualstudio.com",
+        "type": "link"
+      },
+      {
+        "title": "Essential Extensions List",
+        "url": "https://example.com/extensions.pdf",
+        "type": "pdf"
+      }
+    ],
+    "faq": [
+      {
+        "question": "Can I use a different code editor?",
+        "answer": "Yes, but VS Code is recommended for the best experience with this course."
+      }
+    ],
+    "requiresSubmission": true,
+    "orderIndex": 2,
+    "status": "published"
+  },
+  {
+    "Id": 3,
+    "moduleId": 2,
+    "title": "HTML Document Structure",
+    "content": "Understanding the basic structure of HTML documents, including DOCTYPE, html, head, and body elements.",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "resources": [
+      {
+        "title": "HTML5 Reference",
+        "url": "https://developer.mozilla.org/en-US/docs/Web/HTML",
+        "type": "link"
+      }
+    ],
+    "faq": [
+      {
+        "question": "What is DOCTYPE for?",
+        "answer": "DOCTYPE tells the browser which version of HTML to use for rendering the page."
+      }
+    ],
+    "requiresSubmission": true,
+    "orderIndex": 1,
+    "status": "published"
+  },
+  {
+    "Id": 4,
+    "moduleId": 2,
+    "title": "HTML Elements and Tags",
+    "content": "Learn about common HTML elements including headings, paragraphs, lists, links, and images.",
+    "videoUrl": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    "resources": [
+      {
+        "title": "HTML Elements Cheat Sheet",
+        "url": "https://example.com/html-cheatsheet.pdf",
+        "type": "pdf"
+      }
+    ],
+    "faq": [
+      {
+        "question": "What's the difference between block and inline elements?",
+        "answer": "Block elements take up the full width available, while inline elements only take up as much width as necessary."
+      }
+    ],
+    "requiresSubmission": true,
+    "orderIndex": 2,
+    "status": "published"
+  }
+]

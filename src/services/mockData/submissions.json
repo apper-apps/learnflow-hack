@@ -1,0 +1,67 @@
+[
+  {
+    "Id": 1,
+    "lessonId": 2,
+    "studentId": 4,
+    "content": "I've successfully set up VS Code with all the recommended extensions. I've also configured the integrated terminal and installed the Live Server extension for testing HTML files. Everything is working perfectly!",
+    "files": [
+      {
+        "name": "screenshot-vscode-setup.png",
+        "url": "https://example.com/files/screenshot1.png",
+        "type": "image"
+      }
+    ],
+    "status": "approved",
+    "submittedAt": "2024-01-26T15:30:00Z"
+  },
+  {
+    "Id": 2,
+    "lessonId": 3,
+    "studentId": 4,
+    "content": "Here's my HTML document structure assignment. I've created a basic HTML5 document with proper DOCTYPE, head section with meta tags and title, and a body with semantic elements.",
+    "files": [
+      {
+        "name": "index.html",
+        "url": "https://example.com/files/index.html",
+        "type": "html"
+      }
+    ],
+    "status": "pending",
+    "submittedAt": "2024-01-28T10:15:00Z"
+  },
+  {
+    "Id": 3,
+    "lessonId": 2,
+    "studentId": 5,
+    "content": "I followed the setup instructions but I'm having trouble with the Live Server extension. It doesn't seem to be working properly when I try to preview my HTML files.",
+    "files": [
+      {
+        "name": "error-screenshot.png",
+        "url": "https://example.com/files/error.png",
+        "type": "image"
+      }
+    ],
+    "status": "changes_requested",
+    "submittedAt": "2024-01-27T16:45:00Z"
+  },
+  {
+    "Id": 4,
+    "lessonId": 4,
+    "studentId": 4,
+    "content": "I've created an HTML page using various elements including headings, paragraphs, lists, and images. I've also experimented with semantic HTML5 elements like article and section.",
+    "files": [
+      {
+        "name": "elements-demo.html",
+        "url": "https://example.com/files/elements.html",
+        "type": "html"
+      },
+      {
+        "name": "preview-screenshot.png",
+        "url": "https://example.com/files/preview.png",
+        "type": "image"
+      }
+    ],
+    "status": "pending",
+    "submittedAt": "2024-01-29T14:20:00Z"
+  }
+]

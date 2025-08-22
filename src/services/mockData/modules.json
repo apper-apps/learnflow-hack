@@ -1,0 +1,51 @@
+[
+  {
+    "Id": 1,
+    "courseId": 1,
+    "title": "Getting Started",
+    "orderIndex": 1,
+    "createdAt": "2024-01-20T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "courseId": 1,
+    "title": "HTML Fundamentals",
+    "orderIndex": 2,
+    "createdAt": "2024-01-20T10:45:00Z"
+  },
+  {
+    "Id": 3,
+    "courseId": 1,
+    "title": "CSS Styling",
+    "orderIndex": 3,
+    "createdAt": "2024-01-20T11:00:00Z"
+  },
+  {
+    "Id": 4,
+    "courseId": 1,
+    "title": "JavaScript Basics",
+    "orderIndex": 4,
+    "createdAt": "2024-01-20T11:15:00Z"
+  },
+  {
+    "Id": 5,
+    "courseId": 2,
+    "title": "React Foundations",
+    "orderIndex": 1,
+    "createdAt": "2024-01-21T15:00:00Z"
+  },
+  {
+    "Id": 6,
+    "courseId": 2,
+    "title": "Components & Props",
+    "orderIndex": 2,
+    "createdAt": "2024-01-21T15:15:00Z"
+  },
+  {
+    "Id": 7,
+    "courseId": 2,
+    "title": "State Management",
+    "orderIndex": 3,
+    "createdAt": "2024-01-21T15:30:00Z"
+  }
+]

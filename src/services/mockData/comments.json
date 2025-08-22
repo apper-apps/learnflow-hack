@@ -1,0 +1,37 @@
+[
+  {
+    "Id": 1,
+    "submissionId": 1,
+    "authorId": 2,
+    "text": "Excellent work! Your development environment setup looks perfect. I can see you've installed all the essential extensions and configured everything correctly.",
+    "createdAt": "2024-01-26T16:00:00Z"
+  },
+  {
+    "Id": 2,
+    "submissionId": 1,
+    "authorId": 4,
+    "text": "Thank you! The setup process was straightforward following your video tutorial.",
+    "createdAt": "2024-01-26T16:15:00Z"
+  },
+  {
+    "Id": 3,
+    "submissionId": 3,
+    "authorId": 2,
+    "text": "I see the issue with your Live Server extension. It looks like you need to right-click on your HTML file and select 'Open with Live Server' instead of just clicking the extension icon.",
+    "createdAt": "2024-01-27T17:30:00Z"
+  },
+  {
+    "Id": 4,
+    "submissionId": 3,
+    "authorId": 2,
+    "text": "Also, make sure your HTML file is saved in a proper folder structure. The Live Server works best when you have a dedicated project folder.",
+    "createdAt": "2024-01-27T17:32:00Z"
+  },
+  {
+    "Id": 5,
+    "submissionId": 3,
+    "authorId": 5,
+    "text": "Thanks for the clarification! I'll try that approach and resubmit.",
+    "createdAt": "2024-01-27T18:00:00Z"
+  }
+]

@@ -1,0 +1,46 @@
+[
+  {
+    "Id": 1,
+    "userId": 4,
+    "courseId": 1,
+    "progress": {
+      "completedLessons": [1, 2],
+      "currentLesson": 3,
+      "overallProgress": 50
+    },
+    "enrolledAt": "2024-01-25T10:00:00Z"
+  },
+  {
+    "Id": 2,
+    "userId": 5,
+    "courseId": 1,
+    "progress": {
+      "completedLessons": [1],
+      "currentLesson": 2,
+      "overallProgress": 25
+    },
+    "enrolledAt": "2024-01-26T14:30:00Z"
+  },
+  {
+    "Id": 3,
+    "userId": 4,
+    "courseId": 2,
+    "progress": {
+      "completedLessons": [],
+      "currentLesson": 1,
+      "overallProgress": 0
+    },
+    "enrolledAt": "2024-01-27T09:15:00Z"
+  },
+  {
+    "Id": 4,
+    "userId": 6,
+    "courseId": 4,
+    "progress": {
+      "completedLessons": [],
+      "currentLesson": 1,
+      "overallProgress": 0
+    },
+    "enrolledAt": "2024-01-28T11:20:00Z"
+  }
+]
