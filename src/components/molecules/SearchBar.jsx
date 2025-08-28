@@ -12,8 +12,8 @@ const SearchBar = ({
 }) => {
   const [value, setValue] = useState("")
 
-  const handleSearch = (e) => {
-const newValue = e.target.value
+const handleSearch = (e) => {
+    const newValue = e.target.value
     setValue(newValue)
     
     if (enableSemantic && newValue.trim()) {
@@ -25,6 +25,7 @@ const newValue = e.target.value
         }
       }, debounceMs)
     } else if (!enableSemantic && onSearch) {
+      // Immediate search for transcript functionality
       onSearch(newValue)
     }
   }

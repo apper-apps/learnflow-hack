@@ -291,7 +291,7 @@ useEffect(() => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Lesson Header */}
+{/* Lesson Header */}
         <div className="bg-white border-b border-gray-200 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -307,40 +307,13 @@ useEffect(() => {
               </div>
             </div>
             
-            {/* Tab Navigation */}
-<div className="flex bg-gray-100 rounded-lg p-1">
-              {["content", "resources", "faq", "search"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    activeTab === tab
-                      ? "bg-white text-primary-600 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  {tab === "search" ? (
-                    <div className="flex items-center">
-                      <ApperIcon name="Search" className="h-4 w-4 mr-1" />
-                      Search
-                    </div>
-                  ) : (
-                    tab.charAt(0).toUpperCase() + tab.slice(1)
-                  )}
-                </button>
-              ))}
-              {currentLesson.requiresSubmission && (
-                <button
-                  onClick={() => setActiveTab("homework")}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    activeTab === "homework"
-                      ? "bg-white text-primary-600 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  Homework
-                </button>
-              )}
+            {/* Search Bar */}
+            <div className="w-80">
+              <SearchBar
+                placeholder="Search this lesson's transcript..."
+                onSearch={handleTranscriptSearch}
+                className="w-full"
+              />
             </div>
           </div>
         </div>
@@ -365,9 +338,39 @@ useEffect(() => {
                 </CardContent>
               </Card>
             )}
+{/* Tabbed Navigation */}
+            <div className="mb-6">
+              <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+                {["content", "resources", "faq"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                      activeTab === tab
+                        ? "bg-white text-primary-600 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+                {currentLesson.requiresSubmission && (
+                  <button
+                    onClick={() => setActiveTab("homework")}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                      activeTab === "homework"
+                        ? "bg-white text-primary-600 shadow-sm"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    Homework
+                  </button>
+                )}
+              </div>
+            </div>
 
             {/* Tab Content */}
-<Card>
+            <Card>
               <CardContent className="p-6">
                 {activeTab === "content" && (
                   <div className="prose max-w-none">
@@ -377,70 +380,8 @@ useEffect(() => {
                   </div>
                 )}
 
-                {activeTab === "search" && (
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-lg font-semibold mb-4">Search Transcript</h3>
-                      <SearchBar
-                        placeholder="Search this lesson's transcript..."
-                        onSearch={handleTranscriptSearch}
-                        className="max-w-2xl"
-                      />
-                    </div>
 
-                    {searchLoading && (
-                      <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-                      </div>
-                    )}
-
-                    {searchResults.length > 0 && (
-                      <div className="space-y-4">
-                        <h4 className="font-medium text-gray-900">
-                          Found {searchResults.length} results
-                        </h4>
-                        {searchResults.map((result) => (
-                          <div
-                            key={result.chunkId}
-                            onClick={() => handleSearchResultClick(result)}
-                            className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md ${
-                              highlightedChunk === result.chunkId
-                                ? "border-primary-500 bg-primary-50"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
-                          >
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex items-center text-sm text-gray-600">
-                                <ApperIcon name="Play" className="h-4 w-4 mr-1" />
-                                {Math.floor(result.startSeconds / 60)}:
-                                {(result.startSeconds % 60).toString().padStart(2, '0')} - 
-                                {Math.floor(result.endSeconds / 60)}:
-                                {(result.endSeconds % 60).toString().padStart(2, '0')}
-                              </div>
-                              <div className="text-xs text-gray-500 font-medium">
-                                {(result.confidence * 100).toFixed(1)}% match
-                              </div>
-                            </div>
-                            <div className="text-gray-700 leading-relaxed">
-                              {result.snippet}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {!searchLoading && searchResults.length === 0 && activeTab === "search" && (
-                      <div className="text-center py-8">
-                        <ApperIcon name="Search" className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                        <p className="text-gray-500">
-                          Search through this lesson's transcript to find specific topics or moments.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === "content" && (
+{activeTab === "content" && (
                   <div className="prose max-w-none">
                     <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
                       {currentLesson.content}
