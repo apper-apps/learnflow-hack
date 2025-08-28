@@ -1,19 +1,20 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
-import { toast } from "react-toastify"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/atoms/Card"
-import Button from "@/components/atoms/Button"
-import ApperIcon from "@/components/ApperIcon"
-import ProgressRing from "@/components/molecules/ProgressRing"
-import StatusBadge from "@/components/molecules/StatusBadge"
-import UserAvatar from "@/components/molecules/UserAvatar"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import { courseService } from "@/services/api/courseService"
-import { submissionService } from "@/services/api/submissionService"
-import { userService } from "@/services/api/userService"
-import { enrollmentService } from "@/services/api/enrollmentService"
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { courseService } from "@/services/api/courseService";
+import { submissionService } from "@/services/api/submissionService";
+import { userService } from "@/services/api/userService";
+import { enrollmentService } from "@/services/api/enrollmentService";
+import ApperIcon from "@/components/ApperIcon";
+import StatusBadge from "@/components/molecules/StatusBadge";
+import ProgressRing from "@/components/molecules/ProgressRing";
+import UserAvatar from "@/components/molecules/UserAvatar";
+import SearchBar from "@/components/molecules/SearchBar";
+import Button from "@/components/atoms/Button";
+import Error from "@/components/ui/Error";
+import Loading from "@/components/ui/Loading";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true)
@@ -106,16 +107,27 @@ const Dashboard = () => {
     </Card>
   )
 
-  return (
+return (
     <div className="p-6 space-y-8">
       {/* Header */}
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-          Welcome back, {currentUser.name}!
-        </h1>
-        <p className="text-gray-600">
-          Here's what's happening in your learning platform today.
-        </p>
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            Welcome back, {currentUser.name}!
+          </h1>
+          <p className="text-gray-600">
+            Here's what's happening in your learning platform today.
+          </p>
+        </div>
+        
+        {/* Quick Search */}
+        <div className="max-w-xl">
+          <SearchBar
+            placeholder="Search across all course content..."
+            enableSemantic={true}
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Stats Grid */}
@@ -284,7 +296,7 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Quick Actions */}
+{/* Quick Actions */}
       <Card>
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
@@ -292,6 +304,14 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Button
+              variant="outline"
+              className="flex items-center justify-center h-24 flex-col space-y-2"
+              onClick={() => navigate('/search')}
+            >
+              <ApperIcon name="Search" className="h-6 w-6" />
+              <span>Semantic Search</span>
+            </Button>
             <Button
               variant="outline"
               size="lg"

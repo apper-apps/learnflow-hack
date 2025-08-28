@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { toast } from "react-toastify"
@@ -8,17 +8,18 @@ import Textarea from "@/components/atoms/Textarea"
 import ApperIcon from "@/components/ApperIcon"
 import ProgressRing from "@/components/molecules/ProgressRing"
 import StatusBadge from "@/components/molecules/StatusBadge"
+import SearchBar from "@/components/molecules/SearchBar"
 import Loading from "@/components/ui/Loading"
 import Error from "@/components/ui/Error"
 import { courseService } from "@/services/api/courseService"
 import { submissionService } from "@/services/api/submissionService"
 import { enrollmentService } from "@/services/api/enrollmentService"
-
+import { searchService } from "@/services/api/searchService"
 const CoursePlayer = () => {
   const { courseId, lessonId } = useParams()
   const navigate = useNavigate()
 
-  const [loading, setLoading] = useState(true)
+const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
   const [courseData, setCourseData] = useState(null)
   const [currentLesson, setCurrentLesson] = useState(null)
@@ -26,7 +27,10 @@ const CoursePlayer = () => {
   const [submissionText, setSubmissionText] = useState("")
   const [files, setFiles] = useState([])
   const [submitting, setSubmitting] = useState(false)
-
+  const [searchResults, setSearchResults] = useState([])
+  const [searchLoading, setSearchLoading] = useState(false)
+  const [highlightedChunk, setHighlightedChunk] = useState(null)
+  const videoRef = useRef(null)
   // Mock current user - in real app this would come from auth context
   const currentUser = {
     Id: 4,
@@ -57,8 +61,12 @@ const CoursePlayer = () => {
         }
       }
 
-      if (foundLesson) {
+if (foundLesson) {
         setCurrentLesson(foundLesson)
+        // Initialize transcript chunks for search if available
+        if (foundLesson.transcriptChunks) {
+          setSearchResults([])
+        }
       }
 
     } catch (err) {
@@ -69,12 +77,61 @@ const CoursePlayer = () => {
     }
   }
 
-  const handleLessonSelect = (lesson) => {
+const handleLessonSelect = (lesson) => {
     setCurrentLesson(lesson)
     navigate(`/courses/${courseId}/play/${lesson.Id}`)
     setSubmissionText("")
     setFiles([])
     setActiveTab("content")
+    setSearchResults([])
+    setHighlightedChunk(null)
+  }
+
+  const handleSeekToTime = async (seconds) => {
+    if (videoRef.current) {
+      try {
+        // For iframe videos, we'll simulate the seek functionality
+        // In a real implementation, you'd use the video player's API
+        videoRef.current.contentWindow?.postMessage({
+          action: 'seekTo',
+          time: seconds
+        }, '*')
+        
+        toast.success(`Seeking to ${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`)
+      } catch (error) {
+        toast.error("Unable to seek video at this time")
+      }
+    }
+  }
+
+  const handleTranscriptSearch = async (query) => {
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setSearchLoading(true)
+    try {
+      const results = await searchService.searchTranscripts(query, {
+        courseId: courseId,
+        lessonId: lessonId
+      })
+      setSearchResults(results)
+    } catch (error) {
+      toast.error("Search failed. Please try again.")
+      setSearchResults([])
+    }
+    setSearchLoading(false)
+  }
+
+  const handleSearchResultClick = (result) => {
+    handleSeekToTime(result.startSeconds)
+    setHighlightedChunk(result.chunkId)
+    
+    // Remove highlight after 3 seconds
+    setTimeout(() => {
+      setHighlightedChunk(null)
+    }, 3000)
   }
 
   const handleFileChange = (e) => {
@@ -118,9 +175,21 @@ const CoursePlayer = () => {
     }
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadCourseData()
   }, [courseId, lessonId])
+
+  useEffect(() => {
+    // Listen for video player ready events
+    const handleMessage = (event) => {
+      if (event.data.action === 'playerReady') {
+        // Video player is ready for seek operations
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   if (loading) return <Loading type="skeleton" />
   if (error) return <Error message={error} onRetry={loadCourseData} />
@@ -239,8 +308,8 @@ const CoursePlayer = () => {
             </div>
             
             {/* Tab Navigation */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              {["content", "resources", "faq"].map((tab) => (
+<div className="flex bg-gray-100 rounded-lg p-1">
+              {["content", "resources", "faq", "search"].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -250,7 +319,14 @@ const CoursePlayer = () => {
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  {tab === "search" ? (
+                    <div className="flex items-center">
+                      <ApperIcon name="Search" className="h-4 w-4 mr-1" />
+                      Search
+                    </div>
+                  ) : (
+                    tab.charAt(0).toUpperCase() + tab.slice(1)
+                  )}
                 </button>
               ))}
               {currentLesson.requiresSubmission && (
@@ -273,11 +349,12 @@ const CoursePlayer = () => {
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="p-6">
             {/* Video Player */}
-            {currentLesson.videoUrl && (
+{currentLesson.videoUrl && (
               <Card className="mb-6">
                 <CardContent className="p-0">
                   <div className="aspect-video bg-gray-900 rounded-t-lg overflow-hidden">
                     <iframe
+                      ref={videoRef}
                       src={currentLesson.videoUrl}
                       className="w-full h-full"
                       frameBorder="0"
@@ -290,8 +367,79 @@ const CoursePlayer = () => {
             )}
 
             {/* Tab Content */}
-            <Card>
+<Card>
               <CardContent className="p-6">
+                {activeTab === "content" && (
+                  <div className="prose max-w-none">
+                    <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">
+                      {currentLesson.content}
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "search" && (
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4">Search Transcript</h3>
+                      <SearchBar
+                        placeholder="Search this lesson's transcript..."
+                        onSearch={handleTranscriptSearch}
+                        className="max-w-2xl"
+                      />
+                    </div>
+
+                    {searchLoading && (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                      </div>
+                    )}
+
+                    {searchResults.length > 0 && (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-gray-900">
+                          Found {searchResults.length} results
+                        </h4>
+                        {searchResults.map((result) => (
+                          <div
+                            key={result.chunkId}
+                            onClick={() => handleSearchResultClick(result)}
+                            className={`p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-md ${
+                              highlightedChunk === result.chunkId
+                                ? "border-primary-500 bg-primary-50"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center text-sm text-gray-600">
+                                <ApperIcon name="Play" className="h-4 w-4 mr-1" />
+                                {Math.floor(result.startSeconds / 60)}:
+                                {(result.startSeconds % 60).toString().padStart(2, '0')} - 
+                                {Math.floor(result.endSeconds / 60)}:
+                                {(result.endSeconds % 60).toString().padStart(2, '0')}
+                              </div>
+                              <div className="text-xs text-gray-500 font-medium">
+                                {(result.confidence * 100).toFixed(1)}% match
+                              </div>
+                            </div>
+                            <div className="text-gray-700 leading-relaxed">
+                              {result.snippet}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {!searchLoading && searchResults.length === 0 && activeTab === "search" && (
+                      <div className="text-center py-8">
+                        <ApperIcon name="Search" className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                        <p className="text-gray-500">
+                          Search through this lesson's transcript to find specific topics or moments.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {activeTab === "content" && (
                   <div className="prose max-w-none">
                     <div className="whitespace-pre-wrap text-gray-700 leading-relaxed">

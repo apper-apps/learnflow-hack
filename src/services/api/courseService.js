@@ -1,10 +1,12 @@
 import coursesData from "@/services/mockData/courses.json"
 import modulesData from "@/services/mockData/modules.json"
 import lessonsData from "@/services/mockData/lessons.json"
+import transcriptChunksData from "@/services/mockData/transcriptChunks.json"
 
 let courses = [...coursesData]
 let modules = [...modulesData]
 let lessons = [...lessonsData]
+let transcriptChunks = [...transcriptChunksData]
 
 const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
 
@@ -66,10 +68,13 @@ export const courseService = {
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(module => ({
         ...module,
-        lessons: lessons
+lessons: lessons
           .filter(l => l.moduleId === module.Id)
           .sort((a, b) => a.orderIndex - b.orderIndex)
-          .map(l => ({ ...l }))
+          .map(l => ({
+            ...l,
+            transcriptChunks: transcriptChunks.filter(chunk => chunk.lessonId === l.Id)
+          }))
       }))
 
     return {

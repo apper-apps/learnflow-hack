@@ -1,10 +1,12 @@
 import submissionsData from "@/services/mockData/submissions.json"
 import commentsData from "@/services/mockData/comments.json"
 import tasksData from "@/services/mockData/tasks.json"
+import searchQueriesData from "@/services/mockData/searchQueries.json"
 
 let submissions = [...submissionsData]
 let comments = [...commentsData]
 let tasks = [...tasksData]
+let searchQueries = [...searchQueriesData]
 
 const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
 

@@ -16,7 +16,7 @@ const Empty = ({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.3 }}
-        className="text-center max-w-md mx-auto px-6"
+className="text-center max-w-md mx-auto px-6"
       >
         <div className="mb-6">
           <div className="mx-auto h-20 w-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">

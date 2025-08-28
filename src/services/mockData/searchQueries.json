@@ -1,0 +1,34 @@
+[
+  {
+    "Id": 1,
+    "userId": 1,
+    "courseId": 1,
+    "queryText": "HTML document structure",
+    "createdAt": "2024-01-25T10:30:00Z",
+    "topResultIds": [4, 1]
+  },
+  {
+    "Id": 2,
+    "userId": 1,
+    "courseId": null,
+    "queryText": "JavaScript interactivity",
+    "createdAt": "2024-01-25T14:15:00Z",
+    "topResultIds": [2]
+  },
+  {
+    "Id": 3,
+    "userId": 1,
+    "courseId": 1,
+    "queryText": "Visual Studio Code setup",
+    "createdAt": "2024-01-26T09:20:00Z",
+    "topResultIds": [3]
+  },
+  {
+    "Id": 4,
+    "userId": 1,
+    "courseId": null,
+    "queryText": "HTML elements and tags",
+    "createdAt": "2024-01-26T16:45:00Z",
+    "topResultIds": [5, 4]
+  }
+]
