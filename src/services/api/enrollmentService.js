@@ -10,6 +10,13 @@ export const enrollmentService = {
     return [...enrollments]
   },
 
+  async getRecent(limit = 5) {
+    await delay()
+    return [...enrollments]
+      .sort((a, b) => new Date(b.enrolledAt) - new Date(a.enrolledAt))
+      .slice(0, limit)
+  },
+
   async getByUserId(userId) {
     await delay()
     return enrollments

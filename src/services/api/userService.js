@@ -4,10 +4,27 @@ let users = [...usersData]
 
 const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 300 + 200))
 
+// Add last login timestamps to mock users for activity tracking
+users.forEach(user => {
+  if (!user.lastLoginAt) {
+    // Add mock login times within the last 24 hours for some users
+    const randomHoursAgo = Math.floor(Math.random() * 24)
+    user.lastLoginAt = new Date(Date.now() - randomHoursAgo * 60 * 60 * 1000).toISOString()
+  }
+})
+
 export const userService = {
   async getAll() {
     await delay()
     return [...users]
+  },
+
+  async getRecentLogins(limit = 5) {
+    await delay()
+    return [...users]
+      .filter(u => u.lastLoginAt)
+      .sort((a, b) => new Date(b.lastLoginAt) - new Date(a.lastLoginAt))
+      .slice(0, limit)
   },
 
   async getById(id) {

@@ -11,9 +11,16 @@ let searchQueries = [...searchQueriesData]
 const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
 
 export const submissionService = {
-  async getAll() {
+async getAll() {
     await delay()
     return [...submissions]
+  },
+
+  async getRecent(limit = 5) {
+    await delay()
+    return [...submissions]
+      .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
+      .slice(0, limit)
   },
 
   async getById(id) {

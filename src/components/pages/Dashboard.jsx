@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
-import { courseService } from "@/services/api/courseService";
+import { activityService } from "@/services/api/activityService";
 import { submissionService } from "@/services/api/submissionService";
 import { userService } from "@/services/api/userService";
 import { enrollmentService } from "@/services/api/enrollmentService";
@@ -17,10 +17,11 @@ import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
-  const [dashboardData, setDashboardData] = useState({
-    courses: [],
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+const [dashboardData, setDashboardData] = useState({
+    activities: [],
+    activityStats: {},
     recentSubmissions: [],
     students: [],
     enrollments: [],
@@ -30,9 +31,9 @@ const Dashboard = () => {
       pendingReviews: 0,
       completedDeliverables: 0
     }
-  })
+});
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Mock current user - in real app this would come from auth context
   const currentUser = {
@@ -46,22 +47,24 @@ const Dashboard = () => {
       setError("")
       setLoading(true)
 
-      const [courses, submissions, students, enrollments] = await Promise.all([
-        courseService.getAll(),
+const [activities, activityStats, submissions, students, enrollments] = await Promise.all([
+        activityService.getRecentActivity(8),
+        activityService.getActivityStats(),
         submissionService.getAll(),
         userService.getByRole("student"),
         enrollmentService.getAll()
-      ])
+])
 
       const stats = {
-        totalCourses: courses.length,
+        totalCourses: enrollments.length,
         totalStudents: students.length,
         pendingReviews: submissions.filter(s => s.status === "pending").length,
         completedDeliverables: submissions.filter(s => s.status === "approved").length
       }
 
       setDashboardData({
-        courses: courses.slice(0, 6), // Show recent courses
+activities,
+        activityStats,
         recentSubmissions: submissions.slice(0, 5),
         students: students.slice(0, 8),
         enrollments,
@@ -163,45 +166,149 @@ return (
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Recent Courses */}
+{/* Recent Activity */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle>Recent Courses</CardTitle>
-                <CardDescription>Your latest course content</CardDescription>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>Platform activity since your last login</CardDescription>
               </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate("/courses")}
-              >
-                View All
-              </Button>
+              <div className="flex items-center gap-2">
+                <div className="text-xs text-gray-500">
+                  Last updated: {new Date().toLocaleTimeString()}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => window.location.reload()}
+                >
+                  <ApperIcon name="RefreshCw" className="h-4 w-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {dashboardData.courses.map((course, index) => (
-              <motion.div
-                key={course.Id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-primary-200 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
-                onClick={() => navigate(`/courses/${course.Id}/edit`)}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center">
-                    <ApperIcon name="BookOpen" className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900">{course.title}</h4>
-                    <p className="text-sm text-gray-500 line-clamp-1">{course.description}</p>
+          <CardContent>
+            {dashboardData.activities.length === 0 ? (
+              <div className="text-center py-8">
+                <ApperIcon name="Activity" className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                <p className="text-gray-500">No recent activity to display</p>
+                <p className="text-sm text-gray-400">Activity will appear here as users interact with the platform</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {dashboardData.activities.map((activity, index) => {
+                  const getActivityColor = (type) => {
+                    switch (type) {
+                      case "submission":
+                        return "from-blue-500 to-blue-600"
+                      case "login":
+                        return "from-green-500 to-green-600"
+                      case "payment":
+                        return "from-purple-500 to-purple-600"
+                      case "enrollment":
+                        return "from-orange-500 to-orange-600"
+                      default:
+                        return "from-gray-500 to-gray-600"
+                    }
+                  }
+
+                  const getTimeAgo = (timestamp) => {
+                    const now = new Date()
+                    const date = new Date(timestamp)
+                    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
+                    
+                    if (diffInHours < 1) return "Just now"
+                    if (diffInHours < 24) return `${diffInHours}h ago`
+                    const diffInDays = Math.floor(diffInHours / 24)
+                    return `${diffInDays}d ago`
+                  }
+
+                  return (
+                    <motion.div
+                      key={activity.Id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <div className={`h-10 w-10 bg-gradient-to-br ${getActivityColor(activity.type)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                        <ApperIcon name={activity.icon} className="h-5 w-5 text-white" />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h4 className="text-sm font-medium text-gray-900 truncate">
+                            {activity.title}
+                          </h4>
+                          <span className="text-xs text-gray-500 flex-shrink-0">
+                            {getTimeAgo(activity.timestamp)}
+                          </span>
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {activity.description}
+                        </p>
+                        
+                        <div className="flex items-center mt-2 space-x-3">
+                          {activity.user && (
+                            <UserAvatar 
+                              user={activity.user} 
+                              size="sm" 
+                              className="flex-shrink-0" 
+                            />
+                          )}
+                          
+                          {activity.status && (
+                            <StatusBadge 
+                              status={activity.status} 
+                              type={activity.type} 
+                              size="sm"
+                            />
+                          )}
+                          
+                          {activity.metadata?.amount && (
+                            <span className="text-xs font-medium text-green-600">
+                              ${activity.metadata.amount}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+                
+                <div className="pt-3 border-t border-gray-100">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div>
+                      <div className="text-lg font-semibold text-blue-600">
+                        {dashboardData.activityStats.todaySubmissions || 0}
+                      </div>
+                      <div className="text-xs text-gray-500">Submissions Today</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-green-600">
+                        {dashboardData.activityStats.todayLogins || 0}
+                      </div>
+                      <div className="text-xs text-gray-500">Logins Today</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-purple-600">
+                        {dashboardData.activityStats.todayPayments || 0}
+                      </div>
+                      <div className="text-xs text-gray-500">Payments Today</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-semibold text-orange-600">
+                        {dashboardData.activityStats.todayEnrollments || 0}
+                      </div>
+                      <div className="text-xs text-gray-500">New Members Today</div>
+                    </div>
                   </div>
                 </div>
-                <StatusBadge status={course.status} type="course" />
-              </motion.div>
-            ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 
