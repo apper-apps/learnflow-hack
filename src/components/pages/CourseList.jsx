@@ -1,20 +1,20 @@
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
-import { motion } from "framer-motion"
-import { toast } from "react-toastify"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/atoms/Card"
-import Button from "@/components/atoms/Button"
-import ApperIcon from "@/components/ApperIcon"
-import SearchBar from "@/components/molecules/SearchBar"
-import StatusBadge from "@/components/molecules/StatusBadge"
-import UserAvatar from "@/components/molecules/UserAvatar"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import { courseService } from "@/services/api/courseService"
-import { userService } from "@/services/api/userService"
-import { enrollmentService } from "@/services/api/enrollmentService"
-
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { toast } from "react-toastify";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/atoms/Card";
+import { courseService } from "@/services/api/courseService";
+import { userService } from "@/services/api/userService";
+import { enrollmentService } from "@/services/api/enrollmentService";
+import ApperIcon from "@/components/ApperIcon";
+import UserAvatar from "@/components/molecules/UserAvatar";
+import SearchBar from "@/components/molecules/SearchBar";
+import StatusBadge from "@/components/molecules/StatusBadge";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
+import CourseActionMenu from "@/components/molecules/CourseActionMenu";
 const CourseList = () => {
   const [courses, setCourses] = useState([])
   const [filteredCourses, setFilteredCourses] = useState([])
@@ -238,41 +238,14 @@ const CourseList = () => {
                   </div>
                 </CardContent>
                 
-<CardFooter className="flex justify-between">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/courses/${course.Id}/play`)
-                    }}
-                  >
-                    <ApperIcon name="Play" className="h-4 w-4 mr-2" />
-                    Preview
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        navigate(`/courses/${course.Id}/edit`)
-                      }}
-                    >
-                      <ApperIcon name="Edit" className="h-4 w-4 mr-2" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="error"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteCourse(course.Id, course.title)
-                      }}
-                    >
-                      <ApperIcon name="Trash2" className="h-4 w-4 mr-2" />
-                      Delete
-                    </Button>
-                  </div>
+<CardFooter className="flex justify-end">
+                  <CourseActionMenu
+                    courseId={course.Id}
+                    courseTitle={course.title}
+                    onPreview={() => navigate(`/courses/${course.Id}/play`)}
+                    onEdit={() => navigate(`/courses/${course.Id}/edit`)}
+                    onDelete={() => handleDeleteCourse(course.Id, course.title)}
+                  />
                 </CardFooter>
               </Card>
             </motion.div>
