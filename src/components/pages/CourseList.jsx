@@ -49,7 +49,7 @@ const CourseList = () => {
     } finally {
       setLoading(false)
     }
-  }
+}
 
   const handleSearch = (query) => {
     setSearchQuery(query)
@@ -59,6 +59,21 @@ const CourseList = () => {
   const handleStatusFilter = (status) => {
     setStatusFilter(status)
     filterCourses(searchQuery, status)
+  }
+
+  const handleDeleteCourse = async (courseId, courseName) => {
+    if (!window.confirm(`Are you sure you want to delete "${courseName}"? This action cannot be undone.`)) {
+      return
+    }
+
+    try {
+      await courseService.delete(courseId)
+      toast.success(`Course "${courseName}" deleted successfully`)
+      loadCourses() // Refresh the course list
+    } catch (error) {
+      console.error("Failed to delete course:", error)
+      toast.error("Failed to delete course. Please try again.")
+    }
   }
 
   const filterCourses = (query, status) => {
@@ -86,7 +101,6 @@ const CourseList = () => {
     const coach = coaches.find(c => c.Id === ownerId)
     return coach ? coach.name : "Unknown Coach"
   }
-
   useEffect(() => {
     loadCourses()
   }, [])
@@ -224,7 +238,7 @@ const CourseList = () => {
                   </div>
                 </CardContent>
                 
-                <CardFooter className="flex justify-between">
+<CardFooter className="flex justify-between">
                   <Button
                     variant="outline"
                     size="sm"
@@ -236,16 +250,29 @@ const CourseList = () => {
                     <ApperIcon name="Play" className="h-4 w-4 mr-2" />
                     Preview
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      navigate(`/courses/${course.Id}/edit`)
-                    }}
-                  >
-                    <ApperIcon name="Edit" className="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        navigate(`/courses/${course.Id}/edit`)
+                      }}
+                    >
+                      <ApperIcon name="Edit" className="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="error"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCourse(course.Id, course.title)
+                      }}
+                    >
+                      <ApperIcon name="Trash2" className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
                 </CardFooter>
               </Card>
             </motion.div>
