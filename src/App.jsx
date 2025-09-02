@@ -28,8 +28,9 @@ function App() {
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
             <Route path="reviews" element={<ReviewInbox />} />
-            <Route path="submissions/:submissionId" element={<SubmissionDetail />} />
+<Route path="submissions/:submissionId" element={<SubmissionDetail />} />
             <Route path="deliverables" element={<DeliverablesBoard />} />
+            <Route path="deliverables/kanban" element={<DeliverablesBoard />} />
             <Route path="tasks" element={<TaskList />} />
           </Route>
         </Routes>
