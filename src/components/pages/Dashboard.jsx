@@ -17,8 +17,9 @@ import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 
 const Dashboard = () => {
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [showAllActivities, setShowAllActivities] = useState(false);
 const [dashboardData, setDashboardData] = useState({
     activities: [],
     activityStats: {},
@@ -227,7 +228,7 @@ return (
 
                   return (
                     <motion.div
-                      key={activity.Id}
+key={activity.Id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
@@ -277,9 +278,26 @@ return (
                       </div>
                     </motion.div>
                   )
-                })}
+                }).slice(0, showAllActivities ? dashboardData.activities.length : 5)}
                 
-                <div className="pt-3 border-t border-gray-100">
+                {dashboardData.activities.length > 5 && (
+                  <div className="pt-3 border-t border-gray-100">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowAllActivities(!showAllActivities)}
+                      className="w-full justify-center"
+                    >
+                      <ApperIcon 
+                        name={showAllActivities ? "ChevronUp" : "ChevronDown"} 
+                        className="h-4 w-4 mr-2" 
+                      />
+                      {showAllActivities ? "Show less" : `Show more (${dashboardData.activities.length - 5} remaining)`}
+                    </Button>
+                  </div>
+                )}
+                
+<div className="pt-3 border-t border-gray-100 mt-4">
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                     <div>
                       <div className="text-lg font-semibold text-blue-600">
