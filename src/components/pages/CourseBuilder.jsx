@@ -18,8 +18,10 @@ const CourseBuilder = () => {
   const navigate = useNavigate()
   const isEditing = !!courseId
 
-  const [loading, setLoading] = useState(false)
+const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [draftStatus, setDraftStatus] = useState("")
+  const [autoSaveTimer, setAutoSaveTimer] = useState(null)
 const [courseData, setCourseData] = useState({
     title: "",
     description: "",
@@ -88,9 +90,9 @@ pricing: courseStructure.pricing || {
     }
   }
 
-  const handleSaveCourse = async () => {
+const handleSaveCourse = async (isDraft = false) => {
     try {
-      if (!courseData.title.trim()) {
+      if (!isDraft && !courseData.title.trim()) {
         toast.error("Please enter a course title")
         return
       }
@@ -98,19 +100,44 @@ pricing: courseStructure.pricing || {
       let savedCourse
       if (isEditing) {
 savedCourse = await courseService.update(courseId, courseData)
-        toast.success("Course updated successfully!")
+        if (isDraft) {
+          setDraftStatus(`Draft saved at ${new Date().toLocaleTimeString()}`)
+        } else {
+          toast.success("Course published successfully!")
+        }
       } else {
 savedCourse = await courseService.create({
           ...courseData,
           ownerId: 2 // Default coach ID for demo
         })
-        toast.success("Course created successfully!")
-        navigate(`/courses/${savedCourse.Id}/edit`)
+        if (isDraft) {
+          setDraftStatus(`Draft saved at ${new Date().toLocaleTimeString()}`)
+          navigate(`/courses/${savedCourse.Id}/edit`)
+        } else {
+          toast.success("Course published successfully!")
+          navigate(`/courses/${savedCourse.Id}/edit`)
+        }
       }
 
     } catch (err) {
-      toast.error("Failed to save course: " + err.message)
+      if (isDraft) {
+        setDraftStatus("Failed to save draft")
+      } else {
+        toast.error("Failed to publish course: " + err.message)
+      }
     }
+  }
+
+  const handleAutoSave = () => {
+    if (autoSaveTimer) {
+      clearTimeout(autoSaveTimer)
+    }
+    
+    const timer = setTimeout(() => {
+      handleSaveCourse(true)
+    }, 1000) // Auto-save after 1 second of inactivity
+    
+    setAutoSaveTimer(timer)
   }
 
   const handleAddModule = async () => {
@@ -255,9 +282,21 @@ savedLesson = await lessonService.create({
     setLessonFormData({ ...lessonFormData, faq: updated })
   }
 
-  useEffect(() => {
+useEffect(() => {
     loadCourseData()
   }, [courseId])
+
+  // Auto-save when courseData changes
+  useEffect(() => {
+    if (courseData.title || courseData.description) {
+      handleAutoSave()
+    }
+    return () => {
+      if (autoSaveTimer) {
+        clearTimeout(autoSaveTimer)
+      }
+    }
+  }, [courseData])
 
   if (loading) return <Loading type="skeleton" />
   if (error) return <Error message={error} onRetry={loadCourseData} />
@@ -265,24 +304,32 @@ savedLesson = await lessonService.create({
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+<div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-            {isEditing ? "Edit Course" : "Create Course"}
+            Create Course
           </h1>
-          <p className="text-gray-600 mt-1">
-            Build engaging courses with structured modules and lessons
-          </p>
+          <div className="flex items-center gap-4 mt-1">
+            <p className="text-gray-600">
+              Build engaging courses with structured modules and lessons
+            </p>
+            {draftStatus && (
+              <div className="flex items-center text-sm text-green-600 bg-green-50 px-2 py-1 rounded-md">
+                <ApperIcon name="Check" className="h-4 w-4 mr-1" />
+                {draftStatus}
+              </div>
+            )}
+          </div>
         </div>
         
-        <div className="flex gap-3">
+<div className="flex gap-3">
           <Button variant="outline" onClick={() => navigate("/courses")}>
             <ApperIcon name="ArrowLeft" className="h-4 w-4 mr-2" />
             Back to Courses
           </Button>
-          <Button onClick={handleSaveCourse}>
-            <ApperIcon name="Save" className="h-4 w-4 mr-2" />
-            {isEditing ? "Update Course" : "Create Course"}
+          <Button onClick={() => handleSaveCourse(false)}>
+            <ApperIcon name="Send" className="h-4 w-4 mr-2" />
+            Publish
           </Button>
         </div>
       </div>
@@ -294,14 +341,14 @@ savedLesson = await lessonService.create({
             <CardTitle>Course Details</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Input
+<Input
               label="Course Title"
               value={courseData.title}
               onChange={(e) => setCourseData({...courseData, title: e.target.value})}
               placeholder="Enter course title"
             />
             
-            <Textarea
+<Textarea
               label="Description"
               value={courseData.description}
               onChange={(e) => setCourseData({...courseData, description: e.target.value})}
@@ -310,7 +357,7 @@ savedLesson = await lessonService.create({
             />
             
             <div className="space-y-4">
-              <Select
+<Select
                 label="Course Status"
                 value={courseData.status}
                 onChange={(e) => setCourseData({...courseData, status: e.target.value})}
