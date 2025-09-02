@@ -28,7 +28,7 @@ export const courseService = {
   async create(courseData) {
     await delay()
     const newCourse = {
-      Id: Math.max(...courses.map(c => c.Id)) + 1,
+Id: Math.max(...courses.map(c => c.Id)) + 1,
       ...courseData,
       createdAt: new Date().toISOString()
     }
@@ -42,7 +42,7 @@ export const courseService = {
     if (index === -1) {
       throw new Error("Course not found")
     }
-    courses[index] = { ...courses[index], ...courseData }
+courses[index] = { ...courses[index], ...courseData }
     return { ...courses[index] }
   },
 
@@ -63,7 +63,7 @@ export const courseService = {
       throw new Error("Course not found")
     }
 
-    const courseModules = modules
+const courseModules = modules
       .filter(m => m.courseId === parseInt(courseId))
       .sort((a, b) => a.orderIndex - b.orderIndex)
       .map(module => ({
@@ -71,7 +71,7 @@ export const courseService = {
 lessons: lessons
           .filter(l => l.moduleId === module.Id)
           .sort((a, b) => a.orderIndex - b.orderIndex)
-          .map(l => ({
+.map(l => ({
             ...l,
             transcriptChunks: transcriptChunks.filter(chunk => chunk.lessonId === l.Id)
           }))
@@ -156,7 +156,7 @@ export const lessonService = {
   async create(lessonData) {
     await delay()
     const newLesson = {
-      Id: Math.max(...lessons.map(l => l.Id)) + 1,
+Id: Math.max(...lessons.map(l => l.Id)) + 1,
       ...lessonData,
       createdAt: new Date().toISOString()
     }
@@ -167,7 +167,7 @@ export const lessonService = {
   async update(id, lessonData) {
     await delay()
     const index = lessons.findIndex(l => l.Id === parseInt(id))
-    if (index === -1) {
+if (index === -1) {
       throw new Error("Lesson not found")
     }
     lessons[index] = { ...lessons[index], ...lessonData }

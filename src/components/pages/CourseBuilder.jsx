@@ -20,10 +20,16 @@ const CourseBuilder = () => {
 
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [courseData, setCourseData] = useState({
+const [courseData, setCourseData] = useState({
     title: "",
     description: "",
-    status: "draft"
+    status: "draft",
+    dripSchedule: {
+      enabled: false,
+      type: "enrollment", // enrollment, start_date, specific_date
+      specificDate: null,
+      lessons: {} // lessonId: { daysAfter: number }
+    }
   })
   const [modules, setModules] = useState([])
   const [selectedModule, setSelectedModule] = useState(null)
@@ -47,10 +53,16 @@ const CourseBuilder = () => {
       setError("")
 
       const courseStructure = await courseService.getCourseStructure(courseId)
-      setCourseData({
+setCourseData({
         title: courseStructure.title,
         description: courseStructure.description,
-        status: courseStructure.status
+        status: courseStructure.status,
+        dripSchedule: courseStructure.dripSchedule || {
+          enabled: false,
+          type: "enrollment",
+          specificDate: null,
+          lessons: {}
+        }
       })
       setModules(courseStructure.modules || [])
 
@@ -71,10 +83,10 @@ const CourseBuilder = () => {
 
       let savedCourse
       if (isEditing) {
-        savedCourse = await courseService.update(courseId, courseData)
+savedCourse = await courseService.update(courseId, courseData)
         toast.success("Course updated successfully!")
       } else {
-        savedCourse = await courseService.create({
+savedCourse = await courseService.create({
           ...courseData,
           ownerId: 2 // Default coach ID for demo
         })
@@ -158,13 +170,13 @@ const CourseBuilder = () => {
 
       let savedLesson
       if (selectedLesson) {
-        savedLesson = await lessonService.update(selectedLesson.Id, {
+savedLesson = await lessonService.update(selectedLesson.Id, {
           ...lessonFormData,
           status: "published"
         })
         toast.success("Lesson updated successfully!")
       } else {
-        savedLesson = await lessonService.create({
+savedLesson = await lessonService.create({
           ...lessonFormData,
           moduleId: selectedModule.Id,
           orderIndex: selectedModule.lessons.length + 1,
@@ -261,29 +273,29 @@ const CourseBuilder = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<div className="space-y-6">
         {/* Course Details */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Course Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                label="Course Title"
-                value={courseData.title}
-                onChange={(e) => setCourseData({...courseData, title: e.target.value})}
-                placeholder="Enter course title"
-              />
-              
-              <Textarea
-                label="Description"
-                value={courseData.description}
-                onChange={(e) => setCourseData({...courseData, description: e.target.value})}
-                placeholder="Describe your course content and objectives"
-                rows={4}
-              />
-              
+        <Card>
+          <CardHeader>
+            <CardTitle>Course Details</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Input
+              label="Course Title"
+              value={courseData.title}
+              onChange={(e) => setCourseData({...courseData, title: e.target.value})}
+              placeholder="Enter course title"
+            />
+            
+            <Textarea
+              label="Description"
+              value={courseData.description}
+              onChange={(e) => setCourseData({...courseData, description: e.target.value})}
+              placeholder="Describe your course content and objectives"
+              rows={4}
+            />
+            
+            <div className="space-y-4">
               <Select
                 label="Course Status"
                 value={courseData.status}
@@ -293,79 +305,164 @@ const CourseBuilder = () => {
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
               </Select>
-
+              
               <div className="pt-4 border-t border-gray-200">
                 <StatusBadge status={courseData.status} type="course" />
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Drip Schedule */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Drip Schedule</CardTitle>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="enableDrip"
+                  checked={courseData.dripSchedule.enabled}
+                  onChange={(e) => setCourseData({
+                    ...courseData,
+                    dripSchedule: {
+                      ...courseData.dripSchedule,
+                      enabled: e.target.checked
+                    }
+                  })}
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <label htmlFor="enableDrip" className="text-sm font-medium text-gray-700">
+                  Enable content dripping
+                </label>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!courseData.dripSchedule.enabled ? (
+              <div className="text-center py-8 text-gray-500">
+                <ApperIcon name="Clock" className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Drip Schedule Disabled</h3>
+                <p className="text-gray-500 mb-4">Enable drip schedule to control when course content is released to students</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Select
+                    label="Drip Type"
+                    value={courseData.dripSchedule.type}
+                    onChange={(e) => setCourseData({
+                      ...courseData,
+                      dripSchedule: {
+                        ...courseData.dripSchedule,
+                        type: e.target.value,
+                        specificDate: e.target.value !== "specific_date" ? null : courseData.dripSchedule.specificDate
+                      }
+                    })}
+                  >
+                    <option value="enrollment">Student enrollment date</option>
+                    <option value="start_date">Student start date</option>
+                    <option value="specific_date">On a specific date</option>
+                  </Select>
+
+                  {courseData.dripSchedule.type === "specific_date" && (
+                    <Input
+                      type="date"
+                      label="Release Date"
+                      value={courseData.dripSchedule.specificDate || ""}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        dripSchedule: {
+                          ...courseData.dripSchedule,
+                          specificDate: e.target.value
+                        }
+                      })}
+                    />
+                  )}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <ApperIcon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">How drip scheduling works:</p>
+                      <ul className="space-y-1 text-blue-700">
+                        <li>• <strong>Student enrollment date:</strong> Content releases based on when student enrolled</li>
+                        <li>• <strong>Student start date:</strong> Content releases when student first accesses the course</li>
+                        <li>• <strong>Specific date:</strong> Content releases on the date you choose for all students</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Course Structure */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>Course Structure</CardTitle>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddModule}
-                  disabled={!isEditing}
-                >
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Course Structure</CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddModule}
+                disabled={!isEditing}
+              >
+                <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
+                Add Module
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!isEditing ? (
+              <div className="text-center py-8 text-gray-500">
+                Save the course first to add modules and lessons
+              </div>
+            ) : modules.length === 0 ? (
+              <div className="text-center py-8">
+                <ApperIcon name="BookOpen" className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
+                <p className="text-gray-500 mb-4">Start building your course by adding the first module</p>
+                <Button onClick={handleAddModule}>
                   <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
-                  Add Module
+                  Add First Module
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
-              {!isEditing ? (
-                <div className="text-center py-8 text-gray-500">
-                  Save the course first to add modules and lessons
-                </div>
-              ) : modules.length === 0 ? (
-                <div className="text-center py-8">
-                  <ApperIcon name="BookOpen" className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No modules yet</h3>
-                  <p className="text-gray-500 mb-4">Start building your course by adding the first module</p>
-                  <Button onClick={handleAddModule}>
-                    <ApperIcon name="Plus" className="h-4 w-4 mr-2" />
-                    Add First Module
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {modules.map((module, moduleIndex) => (
-                    <motion.div
-                      key={module.Id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: moduleIndex * 0.1 }}
-                      className="border border-gray-200 rounded-lg p-4"
-                    >
-                      <div className="flex items-center gap-3 mb-3">
-                        <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                          {moduleIndex + 1}
-                        </div>
-                        <Input
-                          value={module.title}
-                          onChange={(e) => handleUpdateModule(module.Id, e.target.value)}
-                          className="border-0 bg-transparent text-lg font-semibold p-0 focus:ring-0"
-                        />
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleAddLesson(module)}
-                        >
-                          <ApperIcon name="Plus" className="h-4 w-4" />
-                        </Button>
+            ) : (
+              <div className="space-y-4">
+                {modules.map((module, moduleIndex) => (
+                  <motion.div
+                    key={module.Id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: moduleIndex * 0.1 }}
+                    className="border border-gray-200 rounded-lg p-4"
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-8 w-8 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                        {moduleIndex + 1}
                       </div>
+                      <Input
+                        value={module.title}
+                        onChange={(e) => handleUpdateModule(module.Id, e.target.value)}
+                        className="border-0 bg-transparent text-lg font-semibold p-0 focus:ring-0"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleAddLesson(module)}
+                      >
+                        <ApperIcon name="Plus" className="h-4 w-4" />
+                      </Button>
+                    </div>
 
-                      {/* Lessons */}
-                      <div className="ml-11 space-y-2">
-                        {module.lessons?.map((lesson, lessonIndex) => (
+                    {/* Lessons */}
+                    <div className="ml-11 space-y-2">
+                      {module.lessons?.map((lesson, lessonIndex) => (
+                        <div key={lesson.Id} className="space-y-2">
                           <div
-                            key={lesson.Id}
                             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer"
                             onClick={() => handleEditLesson(module, lesson)}
                           >
@@ -378,23 +475,64 @@ const CourseBuilder = () => {
                                 <ApperIcon name="FileText" className="h-4 w-4 text-warning-500" />
                               )}
                             </div>
-                            <StatusBadge status={lesson.status} type="lesson" />
+                            <div className="flex items-center gap-3">
+                              {courseData.dripSchedule.enabled && (
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <ApperIcon name="Clock" className="h-4 w-4" />
+                                  <span>
+                                    Day {courseData.dripSchedule.lessons[lesson.Id] || (moduleIndex * 10 + lessonIndex + 1)}
+                                  </span>
+                                </div>
+                              )}
+                              <StatusBadge status={lesson.status} type="lesson" />
+                            </div>
                           </div>
-                        ))}
-                        
-                        {(!module.lessons || module.lessons.length === 0) && (
-                          <div className="text-sm text-gray-500 italic p-3">
-                            No lessons yet. Click + to add the first lesson.
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                          
+                          {courseData.dripSchedule.enabled && (
+                            <div className="ml-9 flex items-center gap-3 p-2 bg-blue-50 rounded text-sm">
+                              <ApperIcon name="Calendar" className="h-4 w-4 text-blue-600" />
+                              <span className="text-blue-800">Will be released</span>
+                              <Input
+                                type="number"
+                                min="0"
+                                placeholder="0"
+                                value={courseData.dripSchedule.lessons[lesson.Id] || ""}
+                                onChange={(e) => setCourseData({
+                                  ...courseData,
+                                  dripSchedule: {
+                                    ...courseData.dripSchedule,
+                                    lessons: {
+                                      ...courseData.dripSchedule.lessons,
+                                      [lesson.Id]: parseInt(e.target.value) || 0
+                                    }
+                                  }
+                                })}
+                                className="w-20 h-8"
+                              />
+                              <span className="text-blue-800">
+                                days after the {
+                                  courseData.dripSchedule.type === "enrollment" ? "student enrollment date" :
+                                  courseData.dripSchedule.type === "start_date" ? "student start date" :
+                                  "course release date"
+                                }
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {(!module.lessons || module.lessons.length === 0) && (
+                        <div className="text-sm text-gray-500 italic p-3">
+                          No lessons yet. Click + to add the first lesson.
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Lesson Builder Modal */}
@@ -457,7 +595,7 @@ const CourseBuilder = () => {
               <div className="p-6">
                 {/* Step 1: Video */}
                 {lessonFormStep === 1 && (
-                  <div className="space-y-4">
+<div className="space-y-4">
                     <h3 className="text-lg font-semibold">Step 1: Add Training Video</h3>
                     <Input
                       label="Lesson Title"
