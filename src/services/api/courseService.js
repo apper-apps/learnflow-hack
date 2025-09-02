@@ -78,7 +78,7 @@ lessons: lessons
       }))
 
     return {
-      ...course,
+...course,
       modules: courseModules
     }
   }

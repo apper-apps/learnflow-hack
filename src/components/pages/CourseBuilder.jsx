@@ -24,6 +24,12 @@ const [courseData, setCourseData] = useState({
     title: "",
     description: "",
     status: "draft",
+    pricing: {
+      type: "free", // free, one_time, subscription, monthly_plan
+      daysUntilExpiry: null,
+      price: null,
+      monthlyPrice: null
+    },
     dripSchedule: {
       enabled: false,
       type: "enrollment", // enrollment, start_date, specific_date
@@ -57,6 +63,12 @@ setCourseData({
         title: courseStructure.title,
         description: courseStructure.description,
         status: courseStructure.status,
+        pricing: courseStructure.pricing || {
+          type: "free",
+          daysUntilExpiry: null,
+          price: null,
+          monthlyPrice: null
+        },
         dripSchedule: courseStructure.dripSchedule || {
           enabled: false,
           type: "enrollment",
@@ -309,6 +321,194 @@ savedLesson = await lessonService.create({
               <div className="pt-4 border-t border-gray-200">
                 <StatusBadge status={courseData.status} type="course" />
               </div>
+            </div>
+          </CardContent>
+</Card>
+
+        {/* Pricing */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Primary pricing</CardTitle>
+            <p className="text-sm text-gray-600 mt-2">Set the initial pricing option that will be displayed on the course landing page.</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              {/* Free Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'free' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setCourseData({
+                  ...courseData,
+                  pricing: { ...courseData.pricing, type: 'free' }
+                })}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="free"
+                      checked={courseData.pricing.type === 'free'}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        pricing: { ...courseData.pricing, type: e.target.value }
+                      })}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Free</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Offer free content to your subscribers. Optionally, you can set an enrollment duration that will limit the time students have access to your content.
+                    </p>
+                    {courseData.pricing.type === 'free' && (
+                      <div className="mt-4 space-y-3">
+                        <Input
+                          type="number"
+                          placeholder="Number of days"
+                          value={courseData.pricing.daysUntilExpiry || ""}
+                          onChange={(e) => setCourseData({
+                            ...courseData,
+                            pricing: {
+                              ...courseData.pricing,
+                              daysUntilExpiry: e.target.value ? parseInt(e.target.value) : null
+                            }
+                          })}
+                          className="max-w-xs"
+                          label="Days Until Expiry"
+                        />
+                        <p className="text-xs text-gray-500">Leave blank for unlimited access.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* One-time Payment Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'one_time' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setCourseData({
+                  ...courseData,
+                  pricing: { ...courseData.pricing, type: 'one_time' }
+                })}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="one_time"
+                      checked={courseData.pricing.type === 'one_time'}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        pricing: { ...courseData.pricing, type: e.target.value }
+                      })}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">One-time payment</h3>
+                    <p className="text-sm text-gray-600">
+                      Charge students a one-time fee to access the content. Optionally, you can set an enrollment duration that will limit the time students have access to your content.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Subscription/Membership Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'subscription' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setCourseData({
+                  ...courseData,
+                  pricing: { ...courseData.pricing, type: 'subscription' }
+                })}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="subscription"
+                      checked={courseData.pricing.type === 'subscription'}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        pricing: { ...courseData.pricing, type: e.target.value }
+                      })}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Subscription / Membership</h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Charge students recurring monthly fees for access to course content.
+                    </p>
+                    <button className="text-xs text-primary-600 hover:text-primary-800 underline">
+                      Learn more
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Monthly Payment Plan Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'monthly_plan' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => setCourseData({
+                  ...courseData,
+                  pricing: { ...courseData.pricing, type: 'monthly_plan' }
+                })}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="monthly_plan"
+                      checked={courseData.pricing.type === 'monthly_plan'}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        pricing: { ...courseData.pricing, type: e.target.value }
+                      })}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Monthly Payment Plan</h3>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Divide the full price of your course into monthly payments.
+                    </p>
+                    <button className="text-xs text-primary-600 hover:text-primary-800 underline">
+                      Learn more
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Save Button */}
+            <div className="pt-4 border-t border-gray-200">
+              <Button 
+                onClick={handleSaveCourse}
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                <ApperIcon name="Save" className="h-4 w-4 mr-2" />
+                Save primary pricing
+              </Button>
             </div>
           </CardContent>
         </Card>
