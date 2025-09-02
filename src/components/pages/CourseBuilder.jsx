@@ -27,7 +27,7 @@ const [courseData, setCourseData] = useState({
     description: "",
     status: "draft",
     pricing: {
-type: "free", // free, one_time, subscription, monthly_plan
+      type: "free", // free, one_time, subscription, monthly_plan
       daysUntilExpiry: null,
       price: null,
       monthlyPrice: null,
@@ -38,8 +38,38 @@ type: "free", // free, one_time, subscription, monthly_plan
       type: "enrollment", // enrollment, start_date, specific_date
       specificDate: null,
       lessons: {} // lessonId: { daysAfter: number }
+    },
+    settings: {
+      banner: null,
+      bannerUrl: "",
+      colors: {
+        primary: "#4F46E5",
+        secondary: "#7C3AED"
+      },
+      domain: {
+        enabled: false,
+        customDomain: "",
+        subdomain: "",
+        extension: "com"
+      },
+      hyperlink: {
+        baseDomain: "learnflow",
+        extension: "com",
+        coursePath: ""
+      },
+      seo: {
+        metaTitle: "",
+        metaDescription: ""
+      },
+      visibility: {
+        isPublic: true,
+        requiresPassword: false,
+        password: ""
+      }
     }
   })
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [publishedCourseUrl, setPublishedCourseUrl] = useState("")
   const [modules, setModules] = useState([])
   const [selectedModule, setSelectedModule] = useState(null)
   const [selectedLesson, setSelectedLesson] = useState(null)
@@ -66,7 +96,7 @@ setCourseData({
         title: courseStructure.title,
         description: courseStructure.description,
         status: courseStructure.status,
-pricing: courseStructure.pricing || {
+        pricing: courseStructure.pricing || {
           type: "free",
           daysUntilExpiry: null,
           price: null,
@@ -78,6 +108,34 @@ pricing: courseStructure.pricing || {
           type: "enrollment",
           specificDate: null,
           lessons: {}
+        },
+        settings: courseStructure.settings || {
+          banner: null,
+          bannerUrl: "",
+          colors: {
+            primary: "#4F46E5",
+            secondary: "#7C3AED"
+          },
+          domain: {
+            enabled: false,
+            customDomain: "",
+            subdomain: "",
+            extension: "com"
+          },
+          hyperlink: {
+            baseDomain: "learnflow",
+            extension: "com",
+            coursePath: ""
+          },
+          seo: {
+            metaTitle: "",
+            metaDescription: ""
+          },
+          visibility: {
+            isPublic: true,
+            requiresPassword: false,
+            password: ""
+          }
         }
       })
       setModules(courseStructure.modules || [])
@@ -97,24 +155,66 @@ const handleSaveCourse = async (isDraft = false) => {
         return
       }
 
+      // Generate course path for hyperlink if not set
+      if (!isDraft && !courseData.settings.hyperlink.coursePath) {
+        const coursePath = courseData.title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-+|-+$/g, '')
+        setCourseData(prev => ({
+          ...prev,
+          settings: {
+            ...prev.settings,
+            hyperlink: {
+              ...prev.settings.hyperlink,
+              coursePath
+            }
+          }
+        }))
+      }
+
       let savedCourse
+      const courseDataToSave = {
+        ...courseData,
+        settings: {
+          ...courseData.settings,
+          hyperlink: {
+            ...courseData.settings.hyperlink,
+            coursePath: courseData.settings.hyperlink.coursePath || 
+              courseData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+          }
+        }
+      }
+
       if (isEditing) {
-savedCourse = await courseService.update(courseId, courseData)
+        savedCourse = await courseService.update(courseId, courseDataToSave)
         if (isDraft) {
           setDraftStatus(`Draft saved at ${new Date().toLocaleTimeString()}`)
         } else {
-          toast.success("Course published successfully!")
+          // Generate course URL
+          const courseUrl = courseDataToSave.settings.domain.enabled && courseDataToSave.settings.domain.customDomain
+            ? `https://${courseDataToSave.settings.domain.customDomain}/${courseDataToSave.settings.hyperlink.coursePath}`
+            : `https://${courseDataToSave.settings.hyperlink.baseDomain}.${courseDataToSave.settings.hyperlink.extension}/${courseDataToSave.settings.hyperlink.coursePath}`
+          
+          setPublishedCourseUrl(courseUrl)
+          setShowSuccessModal(true)
         }
       } else {
-savedCourse = await courseService.create({
-          ...courseData,
+        savedCourse = await courseService.create({
+          ...courseDataToSave,
           ownerId: 2 // Default coach ID for demo
         })
         if (isDraft) {
           setDraftStatus(`Draft saved at ${new Date().toLocaleTimeString()}`)
           navigate(`/courses/${savedCourse.Id}/edit`)
         } else {
-          toast.success("Course published successfully!")
+          // Generate course URL
+          const courseUrl = courseDataToSave.settings.domain.enabled && courseDataToSave.settings.domain.customDomain
+            ? `https://${courseDataToSave.settings.domain.customDomain}/${courseDataToSave.settings.hyperlink.coursePath}`
+            : `https://${courseDataToSave.settings.hyperlink.baseDomain}.${courseDataToSave.settings.hyperlink.extension}/${courseDataToSave.settings.hyperlink.coursePath}`
+          
+          setPublishedCourseUrl(courseUrl)
+          setShowSuccessModal(true)
           navigate(`/courses/${savedCourse.Id}/edit`)
         }
       }
@@ -125,6 +225,33 @@ savedCourse = await courseService.create({
       } else {
         toast.error("Failed to publish course: " + err.message)
       }
+    }
+  }
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success("Course URL copied to clipboard!")
+    } catch (err) {
+      toast.error("Failed to copy URL")
+    }
+  }
+
+  const handleBannerUpload = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setCourseData(prev => ({
+          ...prev,
+          settings: {
+            ...prev.settings,
+            banner: file,
+            bannerUrl: e.target.result
+          }
+        }))
+      }
+      reader.readAsDataURL(file)
     }
   }
 
@@ -984,10 +1111,466 @@ useEffect(() => {
                   </div>
                 </div>
               </div>
+</div>
+          </CardContent>
+        </Card>
+
+        {/* Settings Section */}
+        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-800">
+              <ApperIcon name="Settings" className="h-6 w-6 mr-3" />
+              Course Settings
+            </CardTitle>
+            <p className="text-sm text-purple-600">
+              Customize your course appearance, domain, and visibility settings
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Course Appearance */}
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Palette" className="h-5 w-5 mr-2" />
+                Course Appearance
+              </h3>
+              
+              {/* Banner Upload */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700">Course Banner/Thumbnail</label>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                      className="hidden"
+                      id="banner-upload"
+                    />
+                    <label
+                      htmlFor="banner-upload"
+                      className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 cursor-pointer transition-colors bg-gray-50 hover:bg-gray-100"
+                    >
+                      {courseData.settings.bannerUrl ? (
+                        <img
+                          src={courseData.settings.bannerUrl}
+                          alt="Course banner"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <ApperIcon name="ImagePlus" className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600">Click to upload banner</p>
+                          <p className="text-xs text-gray-400">Recommended: 1200x600px</p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                  {courseData.settings.bannerUrl && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          banner: null,
+                          bannerUrl: ""
+                        }
+                      }))}
+                    >
+                      <ApperIcon name="Trash2" className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Color Scheme */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Primary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={courseData.settings.colors.primary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            primary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                    />
+                    <Input
+                      value={courseData.settings.colors.primary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            primary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Secondary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={courseData.settings.colors.secondary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            secondary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                    />
+                    <Input
+                      value={courseData.settings.colors.secondary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            secondary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Domain Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Globe" className="h-5 w-5 mr-2" />
+                Domain & URL Settings
+              </h3>
+              
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="customDomain"
+                  checked={courseData.settings.domain.enabled}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      domain: {
+                        ...prev.settings.domain,
+                        enabled: e.target.checked
+                      }
+                    }
+                  }))}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label htmlFor="customDomain" className="text-sm font-medium text-gray-700">
+                  Use custom domain
+                </label>
+              </div>
+
+              {courseData.settings.domain.enabled && (
+                <div className="grid md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+                  <Input
+                    label="Custom Domain"
+                    value={courseData.settings.domain.customDomain}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        domain: {
+                          ...prev.settings.domain,
+                          customDomain: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="www.yourdomain.com"
+                  />
+                  <Select
+                    label="Extension"
+                    value={courseData.settings.domain.extension}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        domain: {
+                          ...prev.settings.domain,
+                          extension: e.target.value
+                        }
+                      }
+                    }))}
+                  >
+                    <option value="com">.com</option>
+                    <option value="net">.net</option>
+                    <option value="org">.org</option>
+                    <option value="edu">.edu</option>
+                    <option value="io">.io</option>
+                  </Select>
+                </div>
+              )}
+
+              {/* Default Hyperlink */}
+              <div className="space-y-4">
+                <label className="text-sm font-medium text-gray-700">Course URL</label>
+                <div className="grid md:grid-cols-3 gap-2 items-end">
+                  <Input
+                    label="Base Domain"
+                    value={courseData.settings.hyperlink.baseDomain}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          baseDomain: e.target.value
+                        }
+                      }
+                    }))}
+                    disabled={courseData.settings.domain.enabled}
+                  />
+                  <Select
+                    label="Extension"
+                    value={courseData.settings.hyperlink.extension}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          extension: e.target.value
+                        }
+                      }
+                    }))}
+                    disabled={courseData.settings.domain.enabled}
+                  >
+                    <option value="com">.com</option>
+                    <option value="net">.net</option>
+                    <option value="org">.org</option>
+                    <option value="edu">.edu</option>
+                    <option value="io">.io</option>
+                  </Select>
+                  <Input
+                    label="Course Path"
+                    value={courseData.settings.hyperlink.coursePath}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          coursePath: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="my-course-name"
+                  />
+                </div>
+                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                  <strong>Preview URL:</strong> {
+                    courseData.settings.domain.enabled && courseData.settings.domain.customDomain
+                      ? `https://${courseData.settings.domain.customDomain}/${courseData.settings.hyperlink.coursePath || 'course-path'}`
+                      : `https://${courseData.settings.hyperlink.baseDomain}.${courseData.settings.hyperlink.extension}/${courseData.settings.hyperlink.coursePath || 'course-path'}`
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* SEO Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Search" className="h-5 w-5 mr-2" />
+                SEO & Visibility
+              </h3>
+              
+              <div className="grid md:grid-cols-1 gap-4">
+                <Input
+                  label="SEO Title"
+                  value={courseData.settings.seo.metaTitle}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      seo: {
+                        ...prev.settings.seo,
+                        metaTitle: e.target.value
+                      }
+                    }
+                  }))}
+                  placeholder="Course title for search engines"
+                />
+                <Textarea
+                  label="SEO Description"
+                  value={courseData.settings.seo.metaDescription}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      seo: {
+                        ...prev.settings.seo,
+                        metaDescription: e.target.value
+                      }
+                    }
+                  }))}
+                  placeholder="Brief description for search engines (160 characters max)"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="isPublic"
+                    checked={courseData.settings.visibility.isPublic}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          isPublic: e.target.checked
+                        }
+                      }
+                    }))}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
+                    Make course publicly discoverable
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="requiresPassword"
+                    checked={courseData.settings.visibility.requiresPassword}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          requiresPassword: e.target.checked
+                        }
+                      }
+                    }))}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="requiresPassword" className="text-sm font-medium text-gray-700">
+                    Require password to access course
+                  </label>
+                </div>
+
+                {courseData.settings.visibility.requiresPassword && (
+                  <Input
+                    label="Course Password"
+                    type="password"
+                    value={courseData.settings.visibility.password}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          password: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="Enter course access password"
+                  />
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+{/* Success Modal */}
+      <AnimatePresence>
+        {showSuccessModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-xl shadow-2xl w-full max-w-md"
+            >
+              <div className="p-6 text-center">
+                <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
+                  <ApperIcon name="CheckCircle" className="h-8 w-8 text-green-600" />
+                </div>
+                
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Course Published Successfully! ✅
+                </h3>
+                
+                <p className="text-gray-600 mb-6">
+                  Your course is now live and ready for students
+                </p>
+
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="text-sm text-gray-600 mb-2">Course URL:</div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 text-sm font-mono bg-white border rounded px-3 py-2 text-left overflow-hidden text-ellipsis">
+                      {publishedCourseUrl}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => copyToClipboard(publishedCourseUrl)}
+                      className="shrink-0"
+                    >
+                      <ApperIcon name="Copy" className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSuccessModal(false)}
+                    className="flex-1"
+                  >
+                    Close
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      window.open(publishedCourseUrl, '_blank')
+                      setShowSuccessModal(false)
+                    }}
+                    className="flex-1"
+                  >
+                    <ApperIcon name="ExternalLink" className="h-4 w-4 mr-2" />
+                    View Course
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Lesson Builder Modal */}
       <AnimatePresence>
@@ -1049,7 +1632,7 @@ useEffect(() => {
               <div className="p-6">
                 {/* Step 1: Video */}
                 {lessonFormStep === 1 && (
-<div className="space-y-4">
+                  <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Step 1: Add Training Video</h3>
                     <Input
                       label="Lesson Title"

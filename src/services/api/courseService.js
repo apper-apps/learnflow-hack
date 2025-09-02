@@ -30,7 +30,8 @@ export const courseService = {
     const newCourse = {
 Id: Math.max(...courses.map(c => c.Id)) + 1,
       ...courseData,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
     courses.push(newCourse)
     return { ...newCourse }
@@ -42,7 +43,7 @@ Id: Math.max(...courses.map(c => c.Id)) + 1,
     if (index === -1) {
       throw new Error("Course not found")
     }
-courses[index] = { ...courses[index], ...courseData }
+courses[index] = { ...courses[index], ...courseData, updatedAt: new Date().toISOString() }
     return { ...courses[index] }
   },
 
