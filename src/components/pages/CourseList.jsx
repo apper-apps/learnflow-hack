@@ -209,22 +209,18 @@ const CourseList = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-<Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer group overflow-hidden">
-                {/* Course Banner */}
-                <div className="relative h-24 bg-gradient-to-r from-primary-600 via-primary-500 to-secondary-500 flex items-center justify-center">
-                  <h3 className="text-white font-semibold text-lg text-center px-4 line-clamp-2">
-                    {course.title}
-                  </h3>
-                </div>
-                
-                <CardHeader className="pb-3">
+              <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer group">
+                <CardHeader>
                   <div className="flex items-start justify-between">
                     <StatusBadge status={course.status} type="course" />
                     <div className="text-sm text-gray-500">
                       {getEnrollmentCount(course.Id)} students
                     </div>
                   </div>
-                  <CardDescription className="line-clamp-2 mt-2">
+                  <CardTitle className="group-hover:text-primary-600 transition-colors">
+                    {course.title}
+                  </CardTitle>
+                  <CardDescription className="line-clamp-2">
                     {course.description}
                   </CardDescription>
                 </CardHeader>

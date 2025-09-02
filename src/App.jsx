@@ -1,21 +1,17 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import React from "react";
-import "@/index.css";
-import Layout from "@/components/organisms/Layout";
-import StudentList from "@/components/pages/StudentList";
+import DeliverablesBoard from "@/components/pages/DeliverablesBoard";
+import SubmissionDetail from "@/components/pages/SubmissionDetail";
 import CourseBuilder from "@/components/pages/CourseBuilder";
 import CourseList from "@/components/pages/CourseList";
-import SemanticSearch from "@/components/pages/SemanticSearch";
-import ReviewInbox from "@/components/pages/ReviewInbox";
 import Dashboard from "@/components/pages/Dashboard";
-import CoursePlayer from "@/components/pages/CoursePlayer";
-import DeliverablesBoard from "@/components/pages/DeliverablesBoard";
 import TaskList from "@/components/pages/TaskList";
-import SubmissionDetail from "@/components/pages/SubmissionDetail";
-
-import 'react-toastify/dist/ReactToastify.css'
+import ReviewInbox from "@/components/pages/ReviewInbox";
+import StudentList from "@/components/pages/StudentList";
+import CoursePlayer from "@/components/pages/CoursePlayer";
+import SemanticSearch from "@/components/pages/SemanticSearch";
+import Layout from "@/components/organisms/Layout";
 
 function App() {
   return (
@@ -28,11 +24,11 @@ function App() {
             <Route path="courses/new" element={<CourseBuilder />} />
             <Route path="courses/:courseId/edit" element={<CourseBuilder />} />
             <Route path="courses/:courseId/play" element={<CoursePlayer />} />
-            <Route path="courses/:courseId/play/:lessonId" element={<CoursePlayer />} />
+<Route path="courses/:courseId/play/:lessonId" element={<CoursePlayer />} />
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
             <Route path="reviews" element={<ReviewInbox />} />
-            <Route path="submissions/:submissionId" element={<SubmissionDetail />} />
+<Route path="submissions/:submissionId" element={<SubmissionDetail />} />
             <Route path="deliverables" element={<DeliverablesBoard />} />
             <Route path="deliverables/kanban" element={<DeliverablesBoard />} />
             <Route path="tasks" element={<TaskList />} />
