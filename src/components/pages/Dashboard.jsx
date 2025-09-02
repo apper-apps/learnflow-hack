@@ -51,32 +51,39 @@ const Dashboard = () => {
   })
   const navigate = useNavigate()
 
-  // Load dashboard data
+// Load dashboard data
   const loadDashboardData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Load data from services
-      const [users, enrollments, submissions, activities] = await Promise.all([
-        userService.getAll(),
-        enrollmentService.getAll(),
-        submissionService.getAll(),
-        activityService.getAll()
-      ])
+      // Load data from services with error handling for individual services
+      const loadData = async () => {
+        const results = await Promise.allSettled([
+          userService.getAll().catch(() => []),
+          enrollmentService.getAll().catch(() => []),
+          submissionService.getAll().catch(() => []),
+          activityService.getRecentActivity(6).catch(() => [])
+        ])
 
-      // Calculate stats
+        return {
+          users: results[0].status === 'fulfilled' ? results[0].value : [],
+          enrollments: results[1].status === 'fulfilled' ? results[1].value : [],
+          submissions: results[2].status === 'fulfilled' ? results[2].value : [],
+          activities: results[3].status === 'fulfilled' ? results[3].value : []
+        }
+      }
+
+      const { users, enrollments, submissions, activities } = await loadData()
+
+      // Calculate stats with fallback values
       const totalStudents = users.filter(user => user.role === 'student').length
       const activeCourses = [...new Set(enrollments.map(e => e.courseId))].length
-      const pendingReviews = submissions.filter(s => s.status === 'submitted').length
-      const completedSubmissions = submissions.filter(s => s.status === 'graded').length
+      const pendingReviews = submissions.filter(s => s.status === 'submitted' || s.status === 'pending').length
+      const completedSubmissions = submissions.filter(s => s.status === 'graded' || s.status === 'approved').length
       const completionRate = submissions.length > 0 ? Math.round((completedSubmissions / submissions.length) * 100) : 0
 
-      // Get recent activities and submissions
-      const recentActivities = activities
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, 6)
-
+      // Get recent submissions (already sorted by service or sort here)
       const recentSubmissions = submissions
         .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
         .slice(0, 5)
@@ -88,13 +95,23 @@ const Dashboard = () => {
           pendingReviews,
           completionRate
         },
-        activities: recentActivities,
-        recentSubmissions
+        activities: activities || [],
+        recentSubmissions: recentSubmissions || []
       })
     } catch (err) {
       console.error('Failed to load dashboard data:', err)
-      setError('Failed to load dashboard data')
-      toast.error('Failed to load dashboard data')
+      // Don't set error state - instead provide minimal default data so dashboard is still usable
+      setDashboardData({
+        stats: {
+          totalStudents: 0,
+          activeCourses: 0,
+          pendingReviews: 0,
+          completionRate: 0
+        },
+        activities: [],
+        recentSubmissions: []
+      })
+      toast.error('Some dashboard data could not be loaded, but you can still use the dashboard.')
     } finally {
       setLoading(false)
     }
