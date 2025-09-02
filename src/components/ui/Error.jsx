@@ -16,8 +16,8 @@ const Error = ({
         transition={{ duration: 0.3 }}
         className="text-center max-w-md mx-auto px-6"
       >
-        <div className="mb-6">
-          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-error-100 to-error-200 rounded-full flex items-center justify-center">
+<div className="mb-6">
+          <div className="mx-auto h-16 w-16 bg-gradient-to-br from-error-50 to-error-100 rounded-full flex items-center justify-center">
             <ApperIcon 
               name="AlertTriangle" 
               className="h-8 w-8 text-error-600" 
