@@ -5,7 +5,8 @@
     "description": "Learn the basics of HTML, CSS, and JavaScript to build modern web applications.",
     "status": "published",
     "ownerId": 2,
-    "createdAt": "2024-01-20T10:00:00Z"
+    "createdAt": "2024-01-20T10:00:00Z",
+    "courseUrl": "web-development-fundamentals"
   },
   {
     "Id": 2,
@@ -29,6 +30,7 @@
     "description": "Introduction to data analysis, visualization, and machine learning with Python.",
     "status": "published",
     "ownerId": 3,
-    "createdAt": "2024-01-23T11:45:00Z"
+    "createdAt": "2024-01-23T11:45:00Z",
+    "courseUrl": "data-science-essentials"
   }
 ]

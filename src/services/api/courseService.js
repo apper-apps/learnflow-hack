@@ -37,14 +37,40 @@ Id: Math.max(...courses.map(c => c.Id)) + 1,
     return { ...newCourse }
   },
 
-  async update(id, courseData) {
+async update(id, courseData) {
     await delay()
     const index = courses.findIndex(c => c.Id === parseInt(id))
     if (index === -1) {
       throw new Error("Course not found")
     }
-courses[index] = { ...courses[index], ...courseData, updatedAt: new Date().toISOString() }
+    courses[index] = { ...courses[index], ...courseData, updatedAt: new Date().toISOString() }
     return { ...courses[index] }
+  },
+
+  async generateCourseUrl(id, courseTitle) {
+    await delay()
+    const course = courses.find(c => c.Id === parseInt(id))
+    if (!course) {
+      throw new Error("Course not found")
+    }
+
+    // Generate URL slug from course title
+    const urlSlug = courseTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+
+    // Update course with generated URL
+    const index = courses.findIndex(c => c.Id === parseInt(id))
+    courses[index] = { 
+      ...courses[index], 
+      courseUrl: urlSlug,
+      updatedAt: new Date().toISOString() 
+    }
+    
+    return urlSlug
   },
 
   async delete(id) {

@@ -22,9 +22,10 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="courses" element={<CourseList />} />
             <Route path="courses/new" element={<CourseBuilder />} />
-            <Route path="courses/:courseId/edit" element={<CourseBuilder />} />
+<Route path="courses/:courseId/edit" element={<CourseBuilder />} />
             <Route path="courses/:courseId/play" element={<CoursePlayer />} />
-<Route path="courses/:courseId/play/:lessonId" element={<CoursePlayer />} />
+            <Route path="courses/:courseId/play/:lessonId" element={<CoursePlayer />} />
+            <Route path="course/:courseUrl" element={<CoursePlayer />} />
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
             <Route path="reviews" element={<ReviewInbox />} />

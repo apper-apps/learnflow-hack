@@ -16,7 +16,7 @@ import Loading from "@/components/ui/Loading";
 import Button from "@/components/atoms/Button";
 import CourseActionMenu from "@/components/molecules/CourseActionMenu";
 const CourseList = () => {
-  const [courses, setCourses] = useState([])
+const [courses, setCourses] = useState([])
   const [filteredCourses, setFilteredCourses] = useState([])
   const [coaches, setCoaches] = useState([])
   const [enrollments, setEnrollments] = useState([])
@@ -24,10 +24,10 @@ const CourseList = () => {
   const [error, setError] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
-
+  const [creatingUrl, setCreatingUrl] = useState(null)
   const navigate = useNavigate()
 
-  const loadCourses = async () => {
+const loadCourses = async () => {
     try {
       setError("")
       setLoading(true)
@@ -49,7 +49,32 @@ const CourseList = () => {
     } finally {
       setLoading(false)
     }
-}
+  }
+
+  const handleCreateCourseUrl = async (courseId, courseTitle) => {
+    try {
+      setCreatingUrl(courseId)
+      
+      const courseUrl = await courseService.generateCourseUrl(courseId, courseTitle)
+      
+      // Update the course in state
+      const updatedCourses = courses.map(course => 
+        course.Id === courseId 
+          ? { ...course, courseUrl: courseUrl }
+          : course
+      )
+      setCourses(updatedCourses)
+      setFilteredCourses(updatedCourses)
+      
+      toast.success(`Course URL created successfully: ${courseUrl}`)
+      
+    } catch (err) {
+      console.error("Failed to create course URL:", err)
+      toast.error(err.message || "Failed to create course URL")
+    } finally {
+      setCreatingUrl(null)
+    }
+  }
 
   const handleSearch = (query) => {
     setSearchQuery(query)
@@ -235,10 +260,37 @@ const CourseList = () => {
                       <ApperIcon name="Calendar" className="h-4 w-4" />
                       <span>{new Date(course.createdAt).toLocaleDateString()}</span>
                     </div>
-                  </div>
+</div>
                 </CardContent>
                 
-<CardFooter className="flex justify-end">
+                <CardFooter className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
+                    {course.courseUrl ? (
+                      <div className="flex items-center space-x-2">
+                        <ApperIcon name="ExternalLink" size={16} className="text-primary-500" />
+                        <a 
+                          href={`/course/${course.courseUrl}`}
+                          className="text-sm text-primary-600 hover:text-primary-700 font-medium underline"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {course.courseUrl}
+                        </a>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCreateCourseUrl(course.Id, course.title)}
+                        loading={creatingUrl === course.Id}
+                        className="flex items-center space-x-1"
+                      >
+                        <ApperIcon name="Plus" size={14} />
+                        <span>Create URL</span>
+                      </Button>
+                    )}
+                  </div>
+                  
                   <CourseActionMenu
                     courseId={course.Id}
                     courseTitle={course.title}
