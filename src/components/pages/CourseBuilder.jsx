@@ -106,16 +106,16 @@ const courseDataToSave = {
         ...courseData
       }
 
-      if (isEditing) {
+if (isEditing) {
         savedCourse = await courseService.update(courseId, courseDataToSave)
         if (isDraft) {
-if (isDraft) {
           setDraftStatus(`Draft saved at ${new Date().toLocaleTimeString()}`)
         } else {
           // Generate course URL
           const courseUrl = `${window.location.origin}/course/${courseId}`
           setPublishedCourseUrl(courseUrl)
           setShowSuccessModal(true)
+        }
       } else {
         savedCourse = await courseService.create({
           ...courseDataToSave,
