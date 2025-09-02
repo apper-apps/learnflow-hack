@@ -25,10 +25,11 @@ const [courseData, setCourseData] = useState({
     description: "",
     status: "draft",
     pricing: {
-      type: "free", // free, one_time, subscription, monthly_plan
+type: "free", // free, one_time, subscription, monthly_plan
       daysUntilExpiry: null,
       price: null,
-      monthlyPrice: null
+      monthlyPrice: null,
+      currency: "USD"
     },
     dripSchedule: {
       enabled: false,
@@ -63,11 +64,12 @@ setCourseData({
         title: courseStructure.title,
         description: courseStructure.description,
         status: courseStructure.status,
-        pricing: courseStructure.pricing || {
+pricing: courseStructure.pricing || {
           type: "free",
           daysUntilExpiry: null,
           price: null,
-          monthlyPrice: null
+          monthlyPrice: null,
+          currency: "USD"
         },
         dripSchedule: courseStructure.dripSchedule || {
           enabled: false,
@@ -287,7 +289,7 @@ savedLesson = await lessonService.create({
 
 <div className="space-y-6">
         {/* Course Details */}
-        <Card>
+<Card>
           <CardHeader>
             <CardTitle>Course Details</CardTitle>
           </CardHeader>
@@ -322,280 +324,6 @@ savedLesson = await lessonService.create({
                 <StatusBadge status={courseData.status} type="course" />
               </div>
             </div>
-          </CardContent>
-</Card>
-
-        {/* Pricing */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Primary pricing</CardTitle>
-            <p className="text-sm text-gray-600 mt-2">Set the initial pricing option that will be displayed on the course landing page.</p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              {/* Free Option */}
-              <div 
-                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  courseData.pricing.type === 'free' 
-                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => setCourseData({
-                  ...courseData,
-                  pricing: { ...courseData.pricing, type: 'free' }
-                })}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="flex items-center pt-1">
-                    <input
-                      type="radio"
-                      name="pricing"
-                      value="free"
-                      checked={courseData.pricing.type === 'free'}
-                      onChange={(e) => setCourseData({
-                        ...courseData,
-                        pricing: { ...courseData.pricing, type: e.target.value }
-                      })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">Free</h3>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Offer free content to your subscribers. Optionally, you can set an enrollment duration that will limit the time students have access to your content.
-                    </p>
-                    {courseData.pricing.type === 'free' && (
-                      <div className="mt-4 space-y-3">
-                        <Input
-                          type="number"
-                          placeholder="Number of days"
-                          value={courseData.pricing.daysUntilExpiry || ""}
-                          onChange={(e) => setCourseData({
-                            ...courseData,
-                            pricing: {
-                              ...courseData.pricing,
-                              daysUntilExpiry: e.target.value ? parseInt(e.target.value) : null
-                            }
-                          })}
-                          className="max-w-xs"
-                          label="Days Until Expiry"
-                        />
-                        <p className="text-xs text-gray-500">Leave blank for unlimited access.</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* One-time Payment Option */}
-              <div 
-                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  courseData.pricing.type === 'one_time' 
-                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => setCourseData({
-                  ...courseData,
-                  pricing: { ...courseData.pricing, type: 'one_time' }
-                })}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="flex items-center pt-1">
-                    <input
-                      type="radio"
-                      name="pricing"
-                      value="one_time"
-                      checked={courseData.pricing.type === 'one_time'}
-                      onChange={(e) => setCourseData({
-                        ...courseData,
-                        pricing: { ...courseData.pricing, type: e.target.value }
-                      })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">One-time payment</h3>
-                    <p className="text-sm text-gray-600">
-                      Charge students a one-time fee to access the content. Optionally, you can set an enrollment duration that will limit the time students have access to your content.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Subscription/Membership Option */}
-              <div 
-                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  courseData.pricing.type === 'subscription' 
-                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => setCourseData({
-                  ...courseData,
-                  pricing: { ...courseData.pricing, type: 'subscription' }
-                })}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="flex items-center pt-1">
-                    <input
-                      type="radio"
-                      name="pricing"
-                      value="subscription"
-                      checked={courseData.pricing.type === 'subscription'}
-                      onChange={(e) => setCourseData({
-                        ...courseData,
-                        pricing: { ...courseData.pricing, type: e.target.value }
-                      })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">Subscription / Membership</h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      Charge students recurring monthly fees for access to course content.
-                    </p>
-                    <button className="text-xs text-primary-600 hover:text-primary-800 underline">
-                      Learn more
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Monthly Payment Plan Option */}
-              <div 
-                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                  courseData.pricing.type === 'monthly_plan' 
-                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
-                    : 'border-gray-200 hover:border-gray-300'
-                }`}
-                onClick={() => setCourseData({
-                  ...courseData,
-                  pricing: { ...courseData.pricing, type: 'monthly_plan' }
-                })}
-              >
-                <div className="flex items-start space-x-3">
-                  <div className="flex items-center pt-1">
-                    <input
-                      type="radio"
-                      name="pricing"
-                      value="monthly_plan"
-                      checked={courseData.pricing.type === 'monthly_plan'}
-                      onChange={(e) => setCourseData({
-                        ...courseData,
-                        pricing: { ...courseData.pricing, type: e.target.value }
-                      })}
-                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-2">Monthly Payment Plan</h3>
-                    <p className="text-sm text-gray-600 mb-2">
-                      Divide the full price of your course into monthly payments.
-                    </p>
-                    <button className="text-xs text-primary-600 hover:text-primary-800 underline">
-                      Learn more
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <div className="pt-4 border-t border-gray-200">
-              <Button 
-                onClick={handleSaveCourse}
-                size="lg"
-                className="w-full sm:w-auto"
-              >
-                <ApperIcon name="Save" className="h-4 w-4 mr-2" />
-                Save primary pricing
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Drip Schedule */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Drip Schedule</CardTitle>
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="enableDrip"
-                  checked={courseData.dripSchedule.enabled}
-                  onChange={(e) => setCourseData({
-                    ...courseData,
-                    dripSchedule: {
-                      ...courseData.dripSchedule,
-                      enabled: e.target.checked
-                    }
-                  })}
-                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                />
-                <label htmlFor="enableDrip" className="text-sm font-medium text-gray-700">
-                  Enable content dripping
-                </label>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {!courseData.dripSchedule.enabled ? (
-              <div className="text-center py-8 text-gray-500">
-                <ApperIcon name="Clock" className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Drip Schedule Disabled</h3>
-                <p className="text-gray-500 mb-4">Enable drip schedule to control when course content is released to students</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <Select
-                    label="Drip Type"
-                    value={courseData.dripSchedule.type}
-                    onChange={(e) => setCourseData({
-                      ...courseData,
-                      dripSchedule: {
-                        ...courseData.dripSchedule,
-                        type: e.target.value,
-                        specificDate: e.target.value !== "specific_date" ? null : courseData.dripSchedule.specificDate
-                      }
-                    })}
-                  >
-                    <option value="enrollment">Student enrollment date</option>
-                    <option value="start_date">Student start date</option>
-                    <option value="specific_date">On a specific date</option>
-                  </Select>
-
-                  {courseData.dripSchedule.type === "specific_date" && (
-                    <Input
-                      type="date"
-                      label="Release Date"
-                      value={courseData.dripSchedule.specificDate || ""}
-                      onChange={(e) => setCourseData({
-                        ...courseData,
-                        dripSchedule: {
-                          ...courseData.dripSchedule,
-                          specificDate: e.target.value
-                        }
-                      })}
-                    />
-                  )}
-                </div>
-
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <ApperIcon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
-                    <div className="text-sm text-blue-800">
-                      <p className="font-medium mb-1">How drip scheduling works:</p>
-                      <ul className="space-y-1 text-blue-700">
-                        <li>• <strong>Student enrollment date:</strong> Content releases based on when student enrolled</li>
-                        <li>• <strong>Student start date:</strong> Content releases when student first accesses the course</li>
-                        <li>• <strong>Specific date:</strong> Content releases on the date you choose for all students</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </CardContent>
         </Card>
 
@@ -731,6 +459,485 @@ savedLesson = await lessonService.create({
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Drip Schedule */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle>Drip Schedule</CardTitle>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="enableDrip"
+                  checked={courseData.dripSchedule.enabled}
+                  onChange={(e) => setCourseData({
+                    ...courseData,
+                    dripSchedule: {
+                      ...courseData.dripSchedule,
+                      enabled: e.target.checked
+                    }
+                  })}
+                  className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                />
+                <label htmlFor="enableDrip" className="text-sm font-medium text-gray-700">
+                  Enable content dripping
+                </label>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {!courseData.dripSchedule.enabled ? (
+              <div className="text-center py-8 text-gray-500">
+                <ApperIcon name="Clock" className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Drip Schedule Disabled</h3>
+                <p className="text-gray-500 mb-4">Enable drip schedule to control when course content is released to students</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <Select
+                    label="Drip Type"
+                    value={courseData.dripSchedule.type}
+                    onChange={(e) => setCourseData({
+                      ...courseData,
+                      dripSchedule: {
+                        ...courseData.dripSchedule,
+                        type: e.target.value,
+                        specificDate: e.target.value !== "specific_date" ? null : courseData.dripSchedule.specificDate
+                      }
+                    })}
+                  >
+                    <option value="enrollment">Student enrollment date</option>
+                    <option value="start_date">Student start date</option>
+                    <option value="specific_date">On a specific date</option>
+                  </Select>
+
+                  {courseData.dripSchedule.type === "specific_date" && (
+                    <Input
+                      type="date"
+                      label="Release Date"
+                      value={courseData.dripSchedule.specificDate || ""}
+                      onChange={(e) => setCourseData({
+                        ...courseData,
+                        dripSchedule: {
+                          ...courseData.dripSchedule,
+                          specificDate: e.target.value
+                        }
+                      })}
+                    />
+                  )}
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="flex items-start gap-3">
+                    <ApperIcon name="Info" className="h-5 w-5 text-blue-600 mt-0.5" />
+                    <div className="text-sm text-blue-800">
+                      <p className="font-medium mb-1">How drip scheduling works:</p>
+                      <ul className="space-y-1 text-blue-700">
+                        <li>• <strong>Student enrollment date:</strong> Content releases based on when student enrolled</li>
+                        <li>• <strong>Student start date:</strong> Content releases when student first accesses the course</li>
+                        <li>• <strong>Specific date:</strong> Content releases on the date you choose for all students</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pricing */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Pricing</CardTitle>
+            <p className="text-sm text-gray-600 mt-2">Set the pricing option for your course. All changes are automatically saved.</p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-4">
+              {/* Free Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'free' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => {
+                  const updatedData = {
+                    ...courseData,
+                    pricing: { 
+                      ...courseData.pricing, 
+                      type: 'free',
+                      price: null,
+                      monthlyPrice: null
+                    }
+                  };
+                  setCourseData(updatedData);
+                  handleSaveCourse();
+                }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="free"
+                      checked={courseData.pricing.type === 'free'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Free</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Offer free content to your subscribers. Optionally, you can set an enrollment duration that will limit the time students have access to your content.
+                    </p>
+                    {courseData.pricing.type === 'free' && (
+                      <div className="mt-4 space-y-3">
+                        <Input
+                          type="number"
+                          placeholder="Number of days"
+                          value={courseData.pricing.daysUntilExpiry || ""}
+                          onChange={(e) => {
+                            const updatedData = {
+                              ...courseData,
+                              pricing: {
+                                ...courseData.pricing,
+                                daysUntilExpiry: e.target.value ? parseInt(e.target.value) : null
+                              }
+                            };
+                            setCourseData(updatedData);
+                            handleSaveCourse();
+                          }}
+                          className="max-w-xs"
+                          label="Days Until Expiry"
+                        />
+                        <p className="text-xs text-gray-500">Leave blank for unlimited access.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* One-time Payment Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'one_time' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => {
+                  const updatedData = {
+                    ...courseData,
+                    pricing: { 
+                      ...courseData.pricing, 
+                      type: 'one_time',
+                      monthlyPrice: null
+                    }
+                  };
+                  setCourseData(updatedData);
+                  handleSaveCourse();
+                }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="one_time"
+                      checked={courseData.pricing.type === 'one_time'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">One-time payment</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Charge students a single fee to access the complete course content forever.
+                    </p>
+                    {courseData.pricing.type === 'one_time' && (
+                      <div className="mt-4 space-y-3">
+                        <div className="grid grid-cols-2 gap-3 max-w-md">
+                          <div>
+                            <Select
+                              label="Currency"
+                              value={courseData.pricing.currency}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    currency: e.target.value
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                            >
+                              <option value="USD">USD ($)</option>
+                              <option value="EUR">EUR (€)</option>
+                              <option value="GBP">GBP (£)</option>
+                              <option value="CAD">CAD (C$)</option>
+                              <option value="AUD">AUD (A$)</option>
+                              <option value="JPY">JPY (¥)</option>
+                            </Select>
+                          </div>
+                          <div>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              value={courseData.pricing.price || ""}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    price: e.target.value ? parseFloat(e.target.value) : null
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                              label="Price"
+                            />
+                          </div>
+                        </div>
+                        <Input
+                          type="number"
+                          placeholder="Number of days"
+                          value={courseData.pricing.daysUntilExpiry || ""}
+                          onChange={(e) => {
+                            const updatedData = {
+                              ...courseData,
+                              pricing: {
+                                ...courseData.pricing,
+                                daysUntilExpiry: e.target.value ? parseInt(e.target.value) : null
+                              }
+                            };
+                            setCourseData(updatedData);
+                            handleSaveCourse();
+                          }}
+                          className="max-w-xs"
+                          label="Access Duration (Optional)"
+                        />
+                        <p className="text-xs text-gray-500">Leave access duration blank for lifetime access.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Subscription/Membership Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'subscription' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => {
+                  const updatedData = {
+                    ...courseData,
+                    pricing: { 
+                      ...courseData.pricing, 
+                      type: 'subscription',
+                      price: null,
+                      daysUntilExpiry: null
+                    }
+                  };
+                  setCourseData(updatedData);
+                  handleSaveCourse();
+                }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="subscription"
+                      checked={courseData.pricing.type === 'subscription'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Subscription / Membership</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Charge students a recurring monthly fee for continuous access to course content.
+                    </p>
+                    {courseData.pricing.type === 'subscription' && (
+                      <div className="mt-4 space-y-3">
+                        <div className="grid grid-cols-2 gap-3 max-w-md">
+                          <div>
+                            <Select
+                              label="Currency"
+                              value={courseData.pricing.currency}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    currency: e.target.value
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                            >
+                              <option value="USD">USD ($)</option>
+                              <option value="EUR">EUR (€)</option>
+                              <option value="GBP">GBP (£)</option>
+                              <option value="CAD">CAD (C$)</option>
+                              <option value="AUD">AUD (A$)</option>
+                              <option value="JPY">JPY (¥)</option>
+                            </Select>
+                          </div>
+                          <div>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              value={courseData.pricing.monthlyPrice || ""}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    monthlyPrice: e.target.value ? parseFloat(e.target.value) : null
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                              label="Monthly Price"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500">Students will be charged this amount every month for access.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Monthly Payment Plan Option */}
+              <div 
+                className={`border rounded-lg p-4 cursor-pointer transition-all duration-200 ${
+                  courseData.pricing.type === 'monthly_plan' 
+                    ? 'border-primary-300 bg-primary-50 ring-2 ring-primary-200' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+                onClick={() => {
+                  const updatedData = {
+                    ...courseData,
+                    pricing: { 
+                      ...courseData.pricing, 
+                      type: 'monthly_plan',
+                      daysUntilExpiry: null
+                    }
+                  };
+                  setCourseData(updatedData);
+                  handleSaveCourse();
+                }}
+              >
+                <div className="flex items-start space-x-3">
+                  <div className="flex items-center pt-1">
+                    <input
+                      type="radio"
+                      name="pricing"
+                      value="monthly_plan"
+                      checked={courseData.pricing.type === 'monthly_plan'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 mb-2">Monthly Payment Plan</h3>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Allow students to split the total course fee into manageable monthly installments.
+                    </p>
+                    {courseData.pricing.type === 'monthly_plan' && (
+                      <div className="mt-4 space-y-3">
+                        <div className="grid grid-cols-3 gap-3 max-w-lg">
+                          <div>
+                            <Select
+                              label="Currency"
+                              value={courseData.pricing.currency}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    currency: e.target.value
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                            >
+                              <option value="USD">USD ($)</option>
+                              <option value="EUR">EUR (€)</option>
+                              <option value="GBP">GBP (£)</option>
+                              <option value="CAD">CAD (C$)</option>
+                              <option value="AUD">AUD (A$)</option>
+                              <option value="JPY">JPY (¥)</option>
+                            </Select>
+                          </div>
+                          <div>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              value={courseData.pricing.price || ""}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    price: e.target.value ? parseFloat(e.target.value) : null
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                              label="Total Price"
+                            />
+                          </div>
+                          <div>
+                            <Input
+                              type="number"
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                              value={courseData.pricing.monthlyPrice || ""}
+                              onChange={(e) => {
+                                const updatedData = {
+                                  ...courseData,
+                                  pricing: {
+                                    ...courseData.pricing,
+                                    monthlyPrice: e.target.value ? parseFloat(e.target.value) : null
+                                  }
+                                };
+                                setCourseData(updatedData);
+                                handleSaveCourse();
+                              }}
+                              label="Monthly Amount"
+                            />
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          Students pay the monthly amount until the total price is reached, then get lifetime access.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
