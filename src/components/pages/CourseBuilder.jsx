@@ -1112,6 +1112,392 @@ useEffect(() => {
                 </div>
               </div>
 </div>
+</CardContent>
+        </Card>
+
+        {/* Settings Section */}
+        <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-purple-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-purple-800">
+              <ApperIcon name="Settings" className="h-6 w-6 mr-3" />
+              Course Settings
+            </CardTitle>
+            <p className="text-sm text-purple-600">
+              Customize your course appearance, domain, and visibility settings
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            {/* Course Appearance */}
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Palette" className="h-5 w-5 mr-2" />
+                Course Appearance
+              </h3>
+              
+              {/* Banner Upload */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium text-gray-700">Course Banner/Thumbnail</label>
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleBannerUpload}
+                      className="hidden"
+                      id="banner-upload"
+                    />
+                    <label
+                      htmlFor="banner-upload"
+                      className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 cursor-pointer transition-colors bg-gray-50 hover:bg-gray-100"
+                    >
+                      {courseData.settings.bannerUrl ? (
+                        <img
+                          src={courseData.settings.bannerUrl}
+                          alt="Course banner"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <div className="text-center">
+                          <ApperIcon name="ImagePlus" className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                          <p className="text-sm text-gray-600">Click to upload banner</p>
+                          <p className="text-xs text-gray-400">Recommended: 1200x600px</p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                  {courseData.settings.bannerUrl && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          banner: null,
+                          bannerUrl: ""
+                        }
+                      }))}
+                    >
+                      <ApperIcon name="Trash2" className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Color Scheme */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Primary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={courseData.settings.colors.primary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            primary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                    />
+                    <Input
+                      value={courseData.settings.colors.primary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            primary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">Secondary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={courseData.settings.colors.secondary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            secondary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="w-12 h-10 rounded-lg border border-gray-300 cursor-pointer"
+                    />
+                    <Input
+                      value={courseData.settings.colors.secondary}
+                      onChange={(e) => setCourseData(prev => ({
+                        ...prev,
+                        settings: {
+                          ...prev.settings,
+                          colors: {
+                            ...prev.settings.colors,
+                            secondary: e.target.value
+                          }
+                        }
+                      }))}
+                      className="flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Domain Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Globe" className="h-5 w-5 mr-2" />
+                Domain & URL Settings
+              </h3>
+              
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="customDomain"
+                  checked={courseData.settings.domain.enabled}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      domain: {
+                        ...prev.settings.domain,
+                        enabled: e.target.checked
+                      }
+                    }
+                  }))}
+                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                />
+                <label htmlFor="customDomain" className="text-sm font-medium text-gray-700">
+                  Use custom domain
+                </label>
+              </div>
+
+              {courseData.settings.domain.enabled && (
+                <div className="grid md:grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
+                  <Input
+                    label="Custom Domain"
+                    value={courseData.settings.domain.customDomain}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        domain: {
+                          ...prev.settings.domain,
+                          customDomain: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="www.yourdomain.com"
+                  />
+                  <Select
+                    label="Extension"
+                    value={courseData.settings.domain.extension}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        domain: {
+                          ...prev.settings.domain,
+                          extension: e.target.value
+                        }
+                      }
+                    }))}
+                  >
+                    <option value="com">.com</option>
+                    <option value="net">.net</option>
+                    <option value="org">.org</option>
+                    <option value="edu">.edu</option>
+                    <option value="io">.io</option>
+                  </Select>
+                </div>
+              )}
+
+              {/* Default Hyperlink */}
+              <div className="space-y-4">
+                <label className="text-sm font-medium text-gray-700">Course URL</label>
+                <div className="grid md:grid-cols-3 gap-2 items-end">
+                  <Input
+                    label="Base Domain"
+                    value={courseData.settings.hyperlink.baseDomain}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          baseDomain: e.target.value
+                        }
+                      }
+                    }))}
+                    disabled={courseData.settings.domain.enabled}
+                  />
+                  <Select
+                    label="Extension"
+                    value={courseData.settings.hyperlink.extension}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          extension: e.target.value
+                        }
+                      }
+                    }))}
+                    disabled={courseData.settings.domain.enabled}
+                  >
+                    <option value="com">.com</option>
+                    <option value="net">.net</option>
+                    <option value="org">.org</option>
+                    <option value="edu">.edu</option>
+                    <option value="io">.io</option>
+                  </Select>
+                  <Input
+                    label="Course Path"
+                    value={courseData.settings.hyperlink.coursePath}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        hyperlink: {
+                          ...prev.settings.hyperlink,
+                          coursePath: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="my-course-name"
+                  />
+                </div>
+                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                  <strong>Preview URL:</strong> {
+                    courseData.settings.domain.enabled && courseData.settings.domain.customDomain
+                      ? `https://${courseData.settings.domain.customDomain}/${courseData.settings.hyperlink.coursePath || 'course-path'}`
+                      : `https://${courseData.settings.hyperlink.baseDomain}.${courseData.settings.hyperlink.extension}/${courseData.settings.hyperlink.coursePath || 'course-path'}`
+                  }
+                </div>
+              </div>
+            </div>
+
+            {/* SEO Settings */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                <ApperIcon name="Search" className="h-5 w-5 mr-2" />
+                SEO & Visibility
+              </h3>
+              
+              <div className="grid md:grid-cols-1 gap-4">
+                <Input
+                  label="SEO Title"
+                  value={courseData.settings.seo.metaTitle}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      seo: {
+                        ...prev.settings.seo,
+                        metaTitle: e.target.value
+                      }
+                    }
+                  }))}
+                  placeholder="Course title for search engines"
+                />
+                <Textarea
+                  label="SEO Description"
+                  value={courseData.settings.seo.metaDescription}
+                  onChange={(e) => setCourseData(prev => ({
+                    ...prev,
+                    settings: {
+                      ...prev.settings,
+                      seo: {
+                        ...prev.settings.seo,
+                        metaDescription: e.target.value
+                      }
+                    }
+                  }))}
+                  placeholder="Brief description for search engines (160 characters max)"
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="isPublic"
+                    checked={courseData.settings.visibility.isPublic}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          isPublic: e.target.checked
+                        }
+                      }
+                    }))}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isPublic" className="text-sm font-medium text-gray-700">
+                    Make course publicly discoverable
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    id="requiresPassword"
+                    checked={courseData.settings.visibility.requiresPassword}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          requiresPassword: e.target.checked
+                        }
+                      }
+                    }))}
+                    className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="requiresPassword" className="text-sm font-medium text-gray-700">
+                    Require password to access course
+                  </label>
+                </div>
+
+                {courseData.settings.visibility.requiresPassword && (
+                  <Input
+                    label="Course Password"
+                    type="password"
+                    value={courseData.settings.visibility.password}
+                    onChange={(e) => setCourseData(prev => ({
+                      ...prev,
+                      settings: {
+                        ...prev.settings,
+                        visibility: {
+                          ...prev.settings.visibility,
+                          password: e.target.value
+                        }
+                      }
+                    }))}
+                    placeholder="Enter course access password"
+                  />
+                )}
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -1523,7 +1909,7 @@ useEffect(() => {
                 </div>
                 
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Course Published Successfully! ✅
+Course Published Successfully! ✅
                 </h3>
                 
                 <p className="text-gray-600 mb-6">
