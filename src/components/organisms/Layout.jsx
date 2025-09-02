@@ -110,7 +110,7 @@ const Layout = () => {
       </motion.div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-hidden">
+<div className="flex-1 overflow-x-hidden overflow-y-auto custom-scrollbar">
         <Outlet />
       </div>
     </div>
