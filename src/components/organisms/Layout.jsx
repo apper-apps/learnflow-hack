@@ -62,6 +62,12 @@ icon: "Mail",
       roles: ["admin", "coach"]
     },
 {
+name: "Integrations",
+      href: "/integrations",
+      icon: "Zap",
+      roles: ["admin", "coach"]
+    },
+    {
       name: "Account",
       href: "/account",
       icon: "User",
