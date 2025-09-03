@@ -295,9 +295,14 @@ const StudentList = () => {
                   <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
                     <Button variant="outline" size="sm" className="flex-1">
                       <ApperIcon name="MessageSquare" className="h-4 w-4 mr-2" />
-                      Message
+Message
                     </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => window.location.href = `/students/${student.Id}/progress`}
+                    >
                       <ApperIcon name="BarChart3" className="h-4 w-4 mr-2" />
                       Progress
                     </Button>
