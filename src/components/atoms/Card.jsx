@@ -1,14 +1,16 @@
 import { forwardRef } from "react"
 import { cn } from "@/utils/cn"
 
-const Card = forwardRef(({ className, children, ...props }, ref) => (
+const Card = forwardRef(({ className, children, onClick, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-"rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
+      "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
       "hover:shadow-md hover:border-gray-300",
+      onClick && "cursor-pointer",
       className
     )}
+    onClick={onClick}
     {...props}
   >
     {children}
