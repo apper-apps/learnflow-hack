@@ -58,8 +58,14 @@ const Layout = () => {
     { 
       name: "Messages", 
       href: "/chat", 
-      icon: "Mail",
+icon: "Mail",
       roles: ["admin", "coach"]
+    },
+    {
+      title: "Account",
+      path: "/account",
+      icon: "User",
+      roles: ["admin", "coach", "student"]
     }
   ]
 

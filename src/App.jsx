@@ -13,6 +13,7 @@ import StudentList from "@/components/pages/StudentList";
 import StudentProgress from "@/components/pages/StudentProgress";
 import CoursePlayer from "@/components/pages/CoursePlayer";
 import SemanticSearch from "@/components/pages/SemanticSearch";
+import Account from "@/components/pages/Account";
 import Layout from "@/components/organisms/Layout";
 
 function App() {
@@ -36,8 +37,9 @@ function App() {
             <Route path="reviews" element={<ReviewInbox />} />
             <Route path="submissions/:submissionId" element={<SubmissionDetail />} />
             <Route path="deliverables" element={<DeliverablesBoard />} />
-            <Route path="deliverables/kanban" element={<DeliverablesBoard />} />
+<Route path="deliverables/kanban" element={<DeliverablesBoard />} />
             <Route path="tasks" element={<TaskList />} />
+            <Route path="account" element={<Account />} />
           </Route>
         </Routes>
       </div>
