@@ -61,9 +61,9 @@ const Layout = () => {
 icon: "Mail",
       roles: ["admin", "coach"]
     },
-    {
-      title: "Account",
-      path: "/account",
+{
+      name: "Account",
+      href: "/account",
       icon: "User",
       roles: ["admin", "coach", "student"]
     }
