@@ -20,6 +20,7 @@ const Dashboard = () => {
 const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showAllActivities, setShowAllActivities] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 const [dashboardData, setDashboardData] = useState({
     activities: [],
     activityStats: {},
@@ -36,25 +37,24 @@ const [dashboardData, setDashboardData] = useState({
 
   const navigate = useNavigate();
 
-  // Mock current user - in real app this would come from auth context
-  const currentUser = {
-    Id: 1,
-    name: "Sarah Johnson",
-    role: "admin"
-  }
+  // Mock current user ID - in real app this would come from auth context
+  const currentUserId = 1;
 
-  const loadDashboardData = async () => {
+const loadDashboardData = async () => {
     try {
       setError("")
       setLoading(true)
 
-const [activities, activityStats, submissions, students, enrollments] = await Promise.all([
+const [user, activities, activityStats, submissions, students, enrollments] = await Promise.all([
+        userService.getById(currentUserId),
         activityService.getRecentActivity(8),
         activityService.getActivityStats(),
         submissionService.getAll(),
         userService.getByRole("student"),
         enrollmentService.getAll()
 ])
+
+      setCurrentUser(user);
 
       const stats = {
         totalCourses: enrollments.length,
@@ -116,8 +116,8 @@ return (
       {/* Header */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
-            Welcome back, {currentUser.name}!
+<h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            Welcome back, {currentUser?.name || 'User'}!
           </h1>
           <p className="text-gray-600">
             Here's what's happening in your learning platform today.

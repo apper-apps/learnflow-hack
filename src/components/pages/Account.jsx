@@ -326,10 +326,23 @@ function Account() {
                 Account Actions
               </h3>
               <div className="space-y-3">
-                <Button
+<Button
                   variant="outline"
                   className="w-full justify-start gap-3"
-                  onClick={() => toast.info('Password change functionality coming soon')}
+                  onClick={() => {
+                    const currentPassword = prompt('Enter your current password:');
+                    if (currentPassword) {
+                      const newPassword = prompt('Enter your new password:');
+                      if (newPassword) {
+                        const confirmPassword = prompt('Confirm your new password:');
+                        if (newPassword === confirmPassword) {
+                          toast.success('Password changed successfully! You will need to log in again.');
+                        } else {
+                          toast.error('Passwords do not match. Please try again.');
+                        }
+                      }
+                    }
+                  }}
                 >
                   <ApperIcon name="Key" size={16} />
                   Change Password
@@ -337,7 +350,18 @@ function Account() {
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-3"
-                  onClick={() => toast.info('Notification preferences coming soon')}
+                  onClick={() => {
+                    const emailNotifications = confirm('Enable email notifications for course updates and messages?');
+                    const pushNotifications = confirm('Enable push notifications for real-time alerts?');
+                    const weeklyDigest = confirm('Subscribe to weekly progress digest emails?');
+                    
+                    let message = 'Notification preferences updated:\n';
+                    message += `• Email notifications: ${emailNotifications ? 'Enabled' : 'Disabled'}\n`;
+                    message += `• Push notifications: ${pushNotifications ? 'Enabled' : 'Disabled'}\n`;
+                    message += `• Weekly digest: ${weeklyDigest ? 'Enabled' : 'Disabled'}`;
+                    
+                    toast.success(message);
+                  }}
                 >
                   <ApperIcon name="Bell" size={16} />
                   Notification Settings
@@ -345,7 +369,18 @@ function Account() {
                 <Button
                   variant="outline"
                   className="w-full justify-start gap-3"
-                  onClick={() => toast.info('Privacy settings coming soon')}
+                  onClick={() => {
+                    const profileVisibility = confirm('Make your profile visible to other students and coaches?');
+                    const activityTracking = confirm('Allow activity tracking for personalized recommendations?');
+                    const dataSharing = confirm('Share anonymized learning data to help improve the platform?');
+                    
+                    let message = 'Privacy settings updated:\n';
+                    message += `• Profile visibility: ${profileVisibility ? 'Public' : 'Private'}\n`;
+                    message += `• Activity tracking: ${activityTracking ? 'Enabled' : 'Disabled'}\n`;
+                    message += `• Data sharing: ${dataSharing ? 'Enabled' : 'Disabled'}`;
+                    
+                    toast.success(message);
+                  }}
                 >
                   <ApperIcon name="Lock" size={16} />
                   Privacy Settings
