@@ -20,17 +20,21 @@ const CustomDomain = () => {
     dnsRecords: []
   });
   const [newDomain, setNewDomain] = useState('');
+  const [courses, setCourses] = useState([]);
+  const [courseDomains, setCourseDomains] = useState({});
+  const [assigningCourse, setAssigningCourse] = useState(null);
 
   useEffect(() => {
     loadDomainData();
   }, []);
 
-  const loadDomainData = async () => {
+const loadDomainData = async () => {
     try {
       setLoading(true);
-      // Simulate API call
+      // Simulate API calls
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Load domain configuration
       setDomainData({
         currentDomain: 'academy.learnflow.app',
         customDomain: 'learn.mycompany.com',
@@ -41,6 +45,19 @@ const CustomDomain = () => {
           { type: 'TXT', name: '_verification.learn.mycompany.com', value: 'learnflow-verification=abc123', status: 'verified' }
         ]
       });
+
+      // Load courses
+      const { courseService } = await import('@/services/api/courseService');
+      const coursesData = await courseService.getAll();
+      setCourses(coursesData);
+
+      // Load existing course domain assignments
+      setCourseDomains({
+        1: 'learn.mycompany.com/react-fundamentals',
+        2: 'learn.mycompany.com/advanced-javascript',
+        3: 'courses.mycompany.com/ui-design'
+      });
+      
     } catch (err) {
       setError('Failed to load domain information');
       toast.error('Failed to load domain information');
@@ -111,7 +128,7 @@ const CustomDomain = () => {
     }
   };
 
-  const handleRemoveDomain = () => {
+const handleRemoveDomain = () => {
     if (window.confirm('Are you sure you want to remove this custom domain? Your academy will revert to the default domain.')) {
       setDomainData(prev => ({
         ...prev,
@@ -121,6 +138,52 @@ const CustomDomain = () => {
         dnsRecords: []
       }));
       toast.success('Custom domain removed successfully!');
+    }
+  };
+
+  const handleAssignCourseDomain = async (courseId, domain) => {
+    if (!domain.trim()) {
+      toast.error('Please enter a domain or subdomain');
+      return;
+    }
+
+    try {
+      setAssigningCourse(courseId);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      setCourseDomains(prev => ({
+        ...prev,
+        [courseId]: domain.trim()
+      }));
+
+      const course = courses.find(c => c.Id === courseId);
+      toast.success(`Domain assigned successfully! ${course?.title} is now available at ${domain}`);
+    } catch (err) {
+      toast.error('Failed to assign domain. Please try again.');
+    } finally {
+      setAssigningCourse(null);
+    }
+  };
+
+  const handleRemoveCourseDomain = async (courseId) => {
+    try {
+      setAssigningCourse(courseId);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setCourseDomains(prev => {
+        const updated = { ...prev };
+        delete updated[courseId];
+        return updated;
+      });
+
+      const course = courses.find(c => c.Id === courseId);
+      toast.success(`Domain removed from ${course?.title}`);
+    } catch (err) {
+      toast.error('Failed to remove domain assignment');
+    } finally {
+      setAssigningCourse(null);
     }
   };
 
@@ -414,6 +477,85 @@ const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9](
                 </div>
               </div>
             </div>
+</Card>
+
+          {/* Course Domain Assignment */}
+          <Card className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <ApperIcon name="BookOpen" size={20} className="text-primary-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Course Domain Assignment</h2>
+                <p className="text-sm text-gray-500">Assign custom domains or subdomains to individual courses</p>
+              </div>
+            </div>
+
+            {courses.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <ApperIcon name="BookOpen" size={48} className="mx-auto mb-3 text-gray-300" />
+                <p>No courses available</p>
+                <p className="text-sm">Create a course first to assign domain mappings</p>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex gap-3">
+                    <ApperIcon name="Info" size={16} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-blue-700">
+                      <p className="font-medium mb-1">Domain Assignment Options:</p>
+                      <ul className="space-y-1 text-sm">
+                        <li>• <strong>Subdomain:</strong> course.yourdomain.com</li>
+                        <li>• <strong>Subdirectory:</strong> yourdomain.com/course-name</li>
+                        <li>• <strong>Custom path:</strong> yourdomain.com/training/course-name</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full border border-gray-200 rounded-lg">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Course</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Current Domain</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Custom Domain</th>
+                        <th className="px-4 py-3 text-left text-sm font-medium text-gray-700">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {courses.map((course, index) => (
+                        <CourseRow 
+                          key={course.Id}
+                          course={course}
+                          index={index}
+                          currentDomain={domainData.customDomain || domainData.currentDomain}
+                          assignedDomain={courseDomains[course.Id]}
+                          isAssigning={assigningCourse === course.Id}
+                          onAssignDomain={handleAssignCourseDomain}
+                          onRemoveDomain={handleRemoveCourseDomain}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
+                  <div className="flex gap-3">
+                    <ApperIcon name="AlertTriangle" size={16} className="text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-yellow-700">
+                      <p className="font-medium mb-1">Important Notes:</p>
+                      <ul className="space-y-1">
+                        <li>• Domain assignments require your main domain to be verified first</li>
+                        <li>• Students will be redirected from the default course URLs to your custom domains</li>
+                        <li>• You can use the same domain for multiple courses with different paths</li>
+                        <li>• Changes may take a few minutes to take effect</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </Card>
         </div>
       </div>
@@ -421,4 +563,116 @@ const domainRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9](
   );
 };
 
-export default CustomDomain;
+const CourseRow = ({ 
+  course, 
+  index, 
+  currentDomain, 
+  assignedDomain, 
+  isAssigning, 
+  onAssignDomain, 
+  onRemoveDomain 
+}) => {
+  const [newDomain, setNewDomain] = useState(assignedDomain || '');
+
+  const handleAssign = () => {
+    onAssignDomain(course.Id, newDomain);
+  };
+
+  const handleRemove = () => {
+    if (window.confirm(`Remove domain assignment from "${course.title}"?`)) {
+      onRemoveDomain(course.Id);
+      setNewDomain('');
+    }
+  };
+
+  return (
+    <tr className={`border-t border-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-primary-100 rounded-lg">
+            <ApperIcon name="BookOpen" size={16} className="text-primary-600" />
+          </div>
+          <div>
+            <p className="font-medium text-gray-900 text-sm">{course.title}</p>
+            <p className="text-xs text-gray-500">ID: {course.Id}</p>
+          </div>
+        </div>
+      </td>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-mono text-gray-600">
+            {currentDomain}/course/{course.courseUrl || course.Id}
+          </p>
+          <Button
+            onClick={() => window.open(`https://${currentDomain}/course/${course.courseUrl || course.Id}`, '_blank')}
+            variant="ghost"
+            size="sm"
+            className="text-primary-600 hover:text-primary-700"
+          >
+            <ApperIcon name="ExternalLink" size={14} />
+          </Button>
+        </div>
+      </td>
+      <td className="px-4 py-4">
+        {assignedDomain ? (
+          <div className="flex items-center gap-2">
+            <Badge variant="success" className="flex items-center gap-1">
+              <ApperIcon name="Check" size={12} />
+              Assigned
+            </Badge>
+            <p className="text-sm font-mono text-gray-900">{assignedDomain}</p>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              value={newDomain}
+              onChange={(e) => setNewDomain(e.target.value)}
+              placeholder="yourdomain.com/course-name"
+              className="w-64 text-sm"
+            />
+          </div>
+        )}
+      </td>
+      <td className="px-4 py-4">
+        <div className="flex gap-2">
+          {assignedDomain ? (
+            <>
+              <Button
+                onClick={() => window.open(`https://${assignedDomain}`, '_blank')}
+                variant="ghost"
+                size="sm"
+                className="text-primary-600 hover:text-primary-700"
+              >
+                <ApperIcon name="ExternalLink" size={14} />
+              </Button>
+              <Button
+                onClick={handleRemove}
+                loading={isAssigning}
+                variant="ghost"
+                size="sm"
+                className="text-error-600 hover:text-error-700"
+              >
+                <ApperIcon name="Trash2" size={14} />
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={handleAssign}
+              loading={isAssigning}
+              variant="primary"
+              size="sm"
+              disabled={!newDomain.trim()}
+              className="flex items-center gap-1"
+            >
+              <ApperIcon name="Plus" size={14} />
+              Assign
+            </Button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+export default CustomDomain
