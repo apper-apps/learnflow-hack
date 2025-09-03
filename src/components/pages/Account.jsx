@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import ApperIcon from '@/components/ApperIcon';
 import Button from '@/components/atoms/Button';
 import Input from '@/components/atoms/Input';
-import Card from '@/components/atoms/Card';
+import { Card } from '@/components/atoms/Card';
 import Badge from '@/components/atoms/Badge';
 import UserAvatar from '@/components/molecules/UserAvatar';
 import Loading from '@/components/ui/Loading';
