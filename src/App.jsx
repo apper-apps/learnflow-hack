@@ -15,6 +15,10 @@ import CoursePlayer from "@/components/pages/CoursePlayer";
 import SemanticSearch from "@/components/pages/SemanticSearch";
 import Account from "@/components/pages/Account";
 import Integrations from "@/components/pages/Integrations";
+import BusinessDetails from "@/components/pages/BusinessDetails";
+import PlansAndBilling from "@/components/pages/PlansAndBilling";
+import NotificationSettings from "@/components/pages/NotificationSettings";
+import CustomDomain from "@/components/pages/CustomDomain";
 import Layout from "@/components/organisms/Layout";
 function App() {
   return (
@@ -40,8 +44,12 @@ function App() {
 <Route path="deliverables/kanban" element={<DeliverablesBoard />} />
 <Route path="tasks" element={<TaskList />} />
             <Route path="integrations" element={<Integrations />} />
-            <Route path="account" element={<Account />} />
-          </Route>
+<Route path="account" element={<Account />} />
+<Route path="settings/business-details" element={<BusinessDetails />} />
+<Route path="settings/plans-billing" element={<PlansAndBilling />} />
+<Route path="settings/notifications" element={<NotificationSettings />} />
+<Route path="settings/custom-domain" element={<CustomDomain />} />
+</Route>
         </Routes>
       </div>
       

@@ -72,8 +72,35 @@ name: "Integrations",
       href: "/account",
       icon: "User",
       roles: ["admin", "coach", "student"]
+},
+{
+  name: 'Settings',
+  icon: 'Settings',
+  href: '/settings/business-details',
+  children: [
+    {
+      name: 'Business Details',
+      icon: 'Building',
+      href: '/settings/business-details'
+    },
+    {
+      name: 'Plans & Billing',
+      icon: 'CreditCard',
+      href: '/settings/plans-billing'
+    },
+    {
+      name: 'Notifications',
+      icon: 'Bell',
+      href: '/settings/notifications'
+    },
+    {
+      name: 'Custom Domain',
+      icon: 'Globe',
+      href: '/settings/custom-domain'
     }
   ]
+}
+]
 
   const filteredNavigation = navigationItems.filter(item => 
     item.roles.includes(currentUser.role)
