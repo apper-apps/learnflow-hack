@@ -49,11 +49,17 @@ const Layout = () => {
       icon: "Award",
       roles: ["admin", "coach", "student"]
     },
-    { 
+{ 
       name: "Tasks", 
       href: "/tasks", 
       icon: "CheckSquare",
       roles: ["coach"]
+    },
+    { 
+      name: "Messages", 
+      href: "/chat", 
+      icon: "Mail",
+      roles: ["admin", "coach"]
     }
   ]
 

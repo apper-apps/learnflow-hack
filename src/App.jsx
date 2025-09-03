@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import React from "react";
 import DeliverablesBoard from "@/components/pages/DeliverablesBoard";
 import SubmissionDetail from "@/components/pages/SubmissionDetail";
+import Chat from "@/components/pages/Chat";
 import CourseBuilder from "@/components/pages/CourseBuilder";
 import CourseList from "@/components/pages/CourseList";
 import Dashboard from "@/components/pages/Dashboard";
@@ -29,7 +30,9 @@ function App() {
 <Route path="course/:courseUrl" element={<CoursePlayer />} />
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
-            <Route path="students/:studentId/progress" element={<StudentProgress />} />
+<Route path="students/:studentId/progress" element={<StudentProgress />} />
+            <Route path="chat/:studentId" element={<Chat />} />
+            <Route path="chat" element={<Chat />} />
             <Route path="reviews" element={<ReviewInbox />} />
             <Route path="submissions/:submissionId" element={<SubmissionDetail />} />
             <Route path="deliverables" element={<DeliverablesBoard />} />

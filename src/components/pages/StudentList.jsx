@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { toast } from "react-toastify"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card"
@@ -17,6 +18,7 @@ import { enrollmentService } from "@/services/api/enrollmentService"
 import { courseService } from "@/services/api/courseService"
 
 const StudentList = () => {
+const navigate = useNavigate()
   const [students, setStudents] = useState([])
   const [filteredStudents, setFilteredStudents] = useState([])
   const [courses, setCourses] = useState([])
@@ -292,10 +294,15 @@ const StudentList = () => {
                     </div>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
+<div className="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1"
+                      onClick={() => navigate(`/chat/${student.Id}`)}
+                    >
                       <ApperIcon name="MessageSquare" className="h-4 w-4 mr-2" />
-Message
+                      Message
                     </Button>
                     <Button 
                       variant="outline" 
