@@ -1,8 +1,8 @@
-import { useState } from "react"
-import { Outlet, NavLink, useNavigate } from "react-router-dom"
-import { motion, AnimatePresence } from "framer-motion"
-import ApperIcon from "@/components/ApperIcon"
-import UserAvatar from "@/components/molecules/UserAvatar"
+import React, { useState } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import ApperIcon from "@/components/ApperIcon";
+import UserAvatar from "@/components/molecules/UserAvatar";
 
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -48,8 +48,8 @@ const Layout = () => {
       href: "/deliverables", 
       icon: "Award",
       roles: ["admin", "coach", "student"]
-    },
-{ 
+},
+    { 
       name: "Tasks", 
       href: "/tasks", 
       icon: "CheckSquare",
@@ -58,11 +58,11 @@ const Layout = () => {
     { 
       name: "Messages", 
       href: "/chat", 
-icon: "Mail",
+      icon: "Mail",
       roles: ["admin", "coach"]
     },
-{
-name: "Integrations",
+    {
+      name: "Integrations",
       href: "/integrations",
       icon: "Zap",
       roles: ["admin", "coach"]
@@ -72,38 +72,40 @@ name: "Integrations",
       href: "/account",
       icon: "User",
       roles: ["admin", "coach", "student"]
-},
-{
-  name: 'Settings',
-  icon: 'Settings',
-  href: '/settings/business-details',
-  children: [
-    {
-      name: 'Business Details',
-      icon: 'Building',
-      href: '/settings/business-details'
     },
     {
-      name: 'Plans & Billing',
-      icon: 'CreditCard',
-      href: '/settings/plans-billing'
-    },
-    {
-      name: 'Notifications',
-      icon: 'Bell',
-      href: '/settings/notifications'
-    },
-    {
-      name: 'Custom Domain',
-      icon: 'Globe',
-      href: '/settings/custom-domain'
+      name: 'Settings',
+      icon: 'Settings',
+      href: '/settings/business-details',
+      roles: ['admin', 'instructor', 'student'],
+      children: [
+        {
+          name: 'Business Details',
+          icon: 'Building',
+          href: '/settings/business-details'
+        },
+        {
+          name: 'Plans & Billing',
+          icon: 'CreditCard',
+          href: '/settings/plans-billing'
+        },
+        {
+          name: 'Notifications',
+          icon: 'Bell',
+          href: '/settings/notifications'
+        },
+        {
+          name: 'Custom Domain',
+          icon: 'Globe',
+          href: '/settings/custom-domain'
+        }
+      ]
     }
   ]
-}
-]
 
+  // Filter navigation based on user role with defensive programming
   const filteredNavigation = navigationItems.filter(item => 
-    item.roles.includes(currentUser.role)
+    item.roles?.includes(currentUser?.role) ?? true
   )
 
 const NavItem = ({ item, mobile = false, collapsed = false }) => (
