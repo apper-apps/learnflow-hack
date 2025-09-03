@@ -5,6 +5,7 @@ import DeliverablesBoard from "@/components/pages/DeliverablesBoard";
 import SubmissionDetail from "@/components/pages/SubmissionDetail";
 import Chat from "@/components/pages/Chat";
 import CourseBuilder from "@/components/pages/CourseBuilder";
+import CourseBundleBuilder from "@/components/pages/CourseBundleBuilder";
 import CourseList from "@/components/pages/CourseList";
 import Dashboard from "@/components/pages/Dashboard";
 import TaskList from "@/components/pages/TaskList";
@@ -27,12 +28,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
-            <Route path="courses" element={<CourseList />} />
+<Route path="courses" element={<CourseList />} />
             <Route path="courses/new" element={<CourseBuilder />} />
-<Route path="courses/:courseId/edit" element={<CourseBuilder />} />
+            <Route path="courses/:courseId/edit" element={<CourseBuilder />} />
+            <Route path="bundles/new" element={<CourseBundleBuilder />} />
+            <Route path="bundles/:bundleId/edit" element={<CourseBundleBuilder />} />
             <Route path="courses/:courseId/play" element={<CoursePlayer />} />
             <Route path="courses/:courseId/play/:lessonId" element={<CoursePlayer />} />
-<Route path="course/:courseUrl" element={<CoursePlayer />} />
+            <Route path="course/:courseUrl" element={<CoursePlayer />} />
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
 <Route path="students/:studentId/progress" element={<StudentProgress />} />

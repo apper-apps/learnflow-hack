@@ -1,0 +1,94 @@
+[
+  {
+    "Id": 1,
+    "title": "Complete Web Development Bundle",
+    "description": "Master web development from beginner to advanced with our comprehensive course bundle including HTML, CSS, JavaScript, React, and Node.js.",
+    "courses": [1, 2, 3],
+    "status": "published",
+    "pricing": {
+      "type": "one_time",
+      "currency": "USD",
+      "price": 199.99,
+      "monthlyPrice": null,
+      "daysUntilExpiry": null
+    },
+    "dripSchedule": {
+      "enabled": true,
+      "type": "enrollment",
+      "specificDate": null,
+      "courseSchedule": {
+        "1": 0,
+        "2": 7,
+        "3": 14
+      }
+    },
+    "settings": {
+      "allowCourseSkipping": false,
+      "requireSequentialCompletion": true,
+      "certificateEnabled": true,
+      "discussionEnabled": true
+    },
+    "createdAt": "2024-01-15T10:30:00.000Z",
+    "updatedAt": "2024-01-20T14:45:00.000Z"
+  },
+  {
+    "Id": 2,
+    "title": "Digital Marketing Mastery",
+    "description": "Complete digital marketing training covering SEO, social media marketing, email campaigns, and analytics.",
+    "courses": [4, 5],
+    "status": "published",
+    "pricing": {
+      "type": "subscription",
+      "currency": "USD",
+      "price": null,
+      "monthlyPrice": 29.99,
+      "daysUntilExpiry": null
+    },
+    "dripSchedule": {
+      "enabled": false,
+      "type": "enrollment",
+      "specificDate": null,
+      "courseSchedule": {}
+    },
+    "settings": {
+      "allowCourseSkipping": true,
+      "requireSequentialCompletion": false,
+      "certificateEnabled": true,
+      "discussionEnabled": true
+    },
+    "createdAt": "2024-02-01T09:15:00.000Z",
+    "updatedAt": "2024-02-05T16:20:00.000Z"
+  },
+  {
+    "Id": 3,
+    "title": "Design Fundamentals Collection",
+    "description": "Learn the basics of graphic design, UI/UX principles, and design thinking methodologies.",
+    "courses": [6, 7, 8],
+    "status": "draft",
+    "pricing": {
+      "type": "monthly_plan",
+      "currency": "USD",
+      "price": 149.99,
+      "monthlyPrice": 24.99,
+      "daysUntilExpiry": null
+    },
+    "dripSchedule": {
+      "enabled": true,
+      "type": "specific_date",
+      "specificDate": "2024-03-01",
+      "courseSchedule": {
+        "6": 0,
+        "7": 14,
+        "8": 28
+      }
+    },
+    "settings": {
+      "allowCourseSkipping": false,
+      "requireSequentialCompletion": true,
+      "certificateEnabled": false,
+      "discussionEnabled": true
+    },
+    "createdAt": "2024-02-10T11:00:00.000Z",
+    "updatedAt": "2024-02-12T13:30:00.000Z"
+  }
+]
