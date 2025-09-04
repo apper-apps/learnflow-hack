@@ -4,18 +4,18 @@ import { motion } from "framer-motion";
 import { toast } from "react-toastify";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
 import { activityService } from "@/services/api/activityService";
-import { submissionService } from "@/services/api/submissionService";
-import { commentService } from "@/services/api/submissionService";
+import { commentService, submissionService } from "@/services/api/submissionService";
 import { userService } from "@/services/api/userService";
 import { enrollmentService } from "@/services/api/enrollmentService";
+import { getTimeAgo } from "@/utils/timeUtils";
 import ApperIcon from "@/components/ApperIcon";
-import StatusBadge from "@/components/molecules/StatusBadge";
 import ProgressRing from "@/components/molecules/ProgressRing";
 import UserAvatar from "@/components/molecules/UserAvatar";
 import SearchBar from "@/components/molecules/SearchBar";
-import Button from "@/components/atoms/Button";
+import StatusBadge from "@/components/molecules/StatusBadge";
 import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
+import Button from "@/components/atoms/Button";
 
 const Dashboard = () => {
 const [loading, setLoading] = useState(true);
@@ -40,9 +40,7 @@ const [dashboardData, setDashboardData] = useState({
       activeStudentsToday: 0
     }
 });
-
   const navigate = useNavigate();
-
   // Mock current user ID - in real app this would come from auth context
   const currentUserId = 1;
 
@@ -266,16 +264,6 @@ return (
                     }
                   }
 
-                  const getTimeAgo = (timestamp) => {
-                    const now = new Date()
-                    const date = new Date(timestamp)
-                    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60))
-                    
-                    if (diffInHours < 1) return "Just now"
-                    if (diffInHours < 24) return `${diffInHours}h ago`
-                    const diffInDays = Math.floor(diffInHours / 24)
-                    return `${diffInDays}d ago`
-                  }
 
                   return (
                     <motion.div
