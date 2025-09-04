@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'react-toastify'
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/atoms/Card'
@@ -24,14 +24,15 @@ const AICoachManager = () => {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingCoach, setEditingCoach] = useState(null)
   const [currentStep, setCurrentStep] = useState(1)
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     name: "",
     description: "",
     prompt: "",
-    knowledgeBase: "",
+    knowledgeBase: [],
     status: "draft",
     instructions: ""
   })
+  const [dragOver, setDragOver] = useState(false)
 
   const loadData = async () => {
     try {
@@ -57,7 +58,7 @@ const AICoachManager = () => {
   }
 
   const handleCreateCoach = async () => {
-    try {
+try {
       if (!formData.name.trim()) {
         toast.error("Please enter a coach name")
         return
@@ -113,9 +114,9 @@ const AICoachManager = () => {
   const resetForm = () => {
     setFormData({
       name: "",
-      description: "",
+description: "",
       prompt: "",
-      knowledgeBase: "",
+      knowledgeBase: [],
       status: "draft",
       instructions: ""
     })
@@ -124,11 +125,126 @@ const AICoachManager = () => {
     setEditingCoach(null)
   }
 
-  const handleEdit = (coach) => {
-    setFormData(coach)
+const handleEdit = (coach) => {
+    setFormData({
+      ...coach,
+      knowledgeBase: coach.knowledgeBase || []
+    })
     setEditingCoach(coach)
     setShowCreateForm(true)
     setCurrentStep(1)
+  }
+
+  // File upload handlers
+  const handleFileUpload = useCallback((files) => {
+    const validFiles = Array.from(files).filter(file => {
+      const validTypes = ['application/pdf', 'image/*', 'video/*']
+      const maxSize = 50 * 1024 * 1024 // 50MB
+      
+      if (file.size > maxSize) {
+        toast.error(`File ${file.name} is too large. Maximum size is 50MB.`)
+        return false
+      }
+      
+      const isValidType = validTypes.some(type => 
+        type.endsWith('/*') ? file.type.startsWith(type.slice(0, -2)) : file.type === type
+      )
+      
+      if (!isValidType) {
+        toast.error(`File ${file.name} is not a supported type. Please upload PDF, image, or video files.`)
+        return false
+      }
+      
+      return true
+    })
+
+    if (validFiles.length === 0) return
+
+    const newFiles = validFiles.map(file => ({
+      id: Date.now() + Math.random(),
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      file: file,
+      uploadedAt: new Date().toISOString()
+    }))
+
+    setFormData(prev => ({
+      ...prev,
+      knowledgeBase: [...prev.knowledgeBase, ...newFiles]
+    }))
+
+    toast.success(`${newFiles.length} file(s) added to knowledge base`)
+  }, [])
+
+  const handleUrlAdd = useCallback((url) => {
+    if (!url.trim()) return
+
+    // Basic URL validation
+    try {
+      new URL(url)
+    } catch {
+      toast.error('Please enter a valid URL')
+      return
+    }
+
+    const newUrlItem = {
+      id: Date.now(),
+      name: url,
+      type: 'url',
+      url: url,
+      uploadedAt: new Date().toISOString()
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      knowledgeBase: [...prev.knowledgeBase, newUrlItem]
+    }))
+
+    toast.success('URL added to knowledge base')
+  }, [])
+
+  const handleFileRemove = useCallback((fileId) => {
+    setFormData(prev => ({
+      ...prev,
+      knowledgeBase: prev.knowledgeBase.filter(file => file.id !== fileId)
+    }))
+    toast.success('File removed from knowledge base')
+  }, [])
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault()
+    setDragOver(true)
+  }, [])
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault()
+    setDragOver(false)
+  }, [])
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault()
+    setDragOver(false)
+    const files = e.dataTransfer.files
+    if (files.length > 0) {
+      handleFileUpload(files)
+    }
+  }, [handleFileUpload])
+
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const getFileIcon = (type) => {
+    if (type === 'url') return 'Link'
+    if (type === 'application/pdf') return 'FileText'
+    if (type.startsWith('image/')) return 'Image'
+    if (type.startsWith('video/')) return 'Video'
+    return 'File'
   }
 
   const getAssignedContent = (coachId) => {
@@ -242,56 +358,171 @@ const AICoachManager = () => {
         )
 
       case 3:
-        return (
+return (
           <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Step 3: Knowledge Base Training
               </h3>
               <p className="text-gray-600 mb-6">
-                Your AI Coach will be trained on actual lesson content to provide course-specific answers.
+                Upload files and resources to train your AI Coach on specific content and knowledge.
               </p>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+            {/* File Upload Area */}
+            <div 
+              className={`
+                border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200
+                ${dragOver 
+                  ? 'border-primary-400 bg-primary-50' 
+                  : 'border-gray-300 hover:border-gray-400'
+                }
+              `}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <div className="space-y-4">
+                <div className="mx-auto h-16 w-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center">
+                  <ApperIcon name="Upload" className="h-8 w-8 text-primary-600" />
+                </div>
+                <div>
+                  <h4 className="text-lg font-medium text-gray-900 mb-2">
+                    Upload Knowledge Base Files
+                  </h4>
+                  <p className="text-gray-500 mb-4">
+                    Drag and drop files here, or click to browse
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-2 text-sm text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <ApperIcon name="FileText" className="h-4 w-4" />
+                      PDF
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ApperIcon name="Image" className="h-4 w-4" />
+                      Images
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ApperIcon name="Video" className="h-4 w-4" />
+                      Videos
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <ApperIcon name="Link" className="h-4 w-4" />
+                      URLs
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={() => document.getElementById('file-upload').click()}
+                    className="flex items-center gap-2"
+                  >
+                    <ApperIcon name="Plus" className="h-4 w-4" />
+                    Choose Files
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      const url = prompt('Enter URL:')
+                      if (url) handleUrlAdd(url)
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <ApperIcon name="Link" className="h-4 w-4" />
+                    Add URL
+                  </Button>
+                </div>
+              </div>
+              <input
+                id="file-upload"
+                type="file"
+                multiple
+                accept=".pdf,image/*,video/*"
+                onChange={(e) => handleFileUpload(e.target.files)}
+                className="hidden"
+              />
+            </div>
+
+            {/* Uploaded Files Display */}
+            {formData.knowledgeBase.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-900 flex items-center gap-2">
+                  <ApperIcon name="Database" className="h-5 w-5" />
+                  Knowledge Base Files ({formData.knowledgeBase.length})
+                </h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {formData.knowledgeBase.map((file) => (
+                    <motion.div
+                      key={file.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="flex-shrink-0 h-10 w-10 bg-primary-50 rounded-lg flex items-center justify-center">
+                          <ApperIcon 
+                            name={getFileIcon(file.type)} 
+                            className="h-5 w-5 text-primary-600" 
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {file.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {file.type === 'url' ? 'Website' : formatFileSize(file.size)}
+                          </p>
+                        </div>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleFileRemove(file.id)}
+                        className="flex-shrink-0 text-gray-400 hover:text-red-600"
+                      >
+                        <ApperIcon name="Trash2" className="h-4 w-4" />
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Training Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="h-12 w-12 bg-green-600 rounded-lg flex items-center justify-center">
+                <div className="h-12 w-12 bg-blue-600 rounded-lg flex items-center justify-center">
                   <ApperIcon name="Brain" className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-green-900">Smart Training Process</h4>
-                  <p className="text-sm text-green-700">AI trained on your actual lessons for accurate, relevant responses</p>
+                  <h4 className="font-semibold text-blue-900">AI Training Process</h4>
+                  <p className="text-sm text-blue-700">Your files will be processed and used to train the AI coach</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
-                  <ApperIcon name="Check" className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-800">Analyzes lesson transcripts and content</span>
+                  <ApperIcon name="Check" className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-800">Extracts and analyzes content from uploaded files</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <ApperIcon name="Check" className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-800">Learns course-specific terminology</span>
+                  <ApperIcon name="Check" className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-800">Learns domain-specific terminology and concepts</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <ApperIcon name="Check" className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-800">Provides contextually relevant answers</span>
+                  <ApperIcon name="Check" className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-800">Provides contextually relevant, accurate responses</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <ApperIcon name="Check" className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-green-800">Never gives generic responses</span>
+                  <ApperIcon name="Check" className="h-4 w-4 text-blue-600" />
+                  <span className="text-sm text-blue-800">References specific content from your uploaded materials</span>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h4 className="font-medium text-gray-900 mb-2">Training will include:</h4>
-              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                <li>All lesson transcripts and content</li>
-                <li>Course materials and resources</li>
-                <li>Module structure and learning objectives</li>
-                <li>Frequently asked questions</li>
-              </ul>
             </div>
           </div>
         )

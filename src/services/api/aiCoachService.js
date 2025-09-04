@@ -24,11 +24,12 @@ export const aiCoachService = {
   },
 
   // Create new AI coach
-  async create(coachData) {
+async create(coachData) {
     await delay()
     const newCoach = {
       ...coachData,
       Id: Math.max(...coaches.map(c => c.Id), 0) + 1,
+      knowledgeBase: coachData.knowledgeBase || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
@@ -43,9 +44,10 @@ export const aiCoachService = {
     if (index === -1) {
       throw new Error("AI Coach not found")
     }
-    coaches[index] = { 
+coaches[index] = { 
       ...coaches[index], 
       ...coachData, 
+      knowledgeBase: coachData.knowledgeBase || [],
       updatedAt: new Date().toISOString() 
     }
     return { ...coaches[index] }

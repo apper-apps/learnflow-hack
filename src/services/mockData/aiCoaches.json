@@ -5,7 +5,22 @@
     "description": "Expert AI coach specialized in digital marketing strategies, campaign optimization, and customer acquisition techniques.",
     "prompt": "You are an expert marketing coach with deep knowledge of digital marketing, campaign optimization, and customer acquisition. Help students understand complex marketing concepts through practical examples and actionable insights based on the course content.",
     "instructions": "Provide clear, actionable marketing advice. Always reference specific course materials when answering questions. Be encouraging and help students think strategically about marketing challenges.",
-    "knowledgeBase": "Trained on marketing course content including digital advertising, social media marketing, email campaigns, and analytics.",
+"knowledgeBase": [
+      {
+        "id": 1,
+        "name": "Digital Marketing Guide.pdf",
+        "type": "application/pdf",
+        "size": 2048576,
+        "uploadedAt": "2024-01-15T10:30:00.000Z"
+      },
+      {
+        "id": 2,
+        "name": "https://example.com/marketing-resources",
+        "type": "url",
+        "url": "https://example.com/marketing-resources",
+        "uploadedAt": "2024-01-15T11:00:00.000Z"
+      }
+    ],
     "status": "active",
     "createdAt": "2024-01-15T10:30:00.000Z",
     "updatedAt": "2024-01-20T14:45:00.000Z"
