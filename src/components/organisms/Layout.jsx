@@ -172,12 +172,15 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
 
           {/* Toggle Button */}
 <div className={`${sidebarCollapsed ? 'px-4' : 'px-6'} pb-4`}>
-            <button
+<button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center p-3 mx-2 text-gray-500 hover:text-primary-600 bg-gray-50 hover:bg-primary-50 rounded-xl transition-all duration-200 border border-gray-200 hover:border-primary-200 shadow-sm hover:shadow-md group"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <ApperIcon name={sidebarCollapsed ? "ChevronRight" : "ChevronLeft"} className="h-5 w-5" />
+              <ApperIcon 
+                name={sidebarCollapsed ? "ChevronRight" : "ChevronLeft"} 
+                className="h-5 w-5 transition-transform duration-200 group-hover:scale-110" 
+              />
             </button>
           </div>
 
