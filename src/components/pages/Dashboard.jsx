@@ -244,793 +244,706 @@ setDashboardData({
 
 return (
     <div className="p-6 space-y-8">
-      {/* Header */}
-      <div className="space-y-4">
+    {/* Header */}
+    <div className="space-y-4">
         <div className="space-y-2">
-<h1 className="text-3xl font-bold text-gray-900">
-            Welcome back, {currentUser?.name || 'User'}!
-          </h1>
-          <p className="text-gray-600">
-            Here's what's happening in your learning platform today.
-          </p>
+            <h1 className="text-3xl font-bold text-gray-900">Welcome back, {currentUser?.name || "User"}!
+                          </h1>
+            <p className="text-gray-600">Here's what's happening in your learning platform today.
+                          </p>
         </div>
-        
         {/* Quick Search */}
         <div className="max-w-xl">
-          <SearchBar
-            placeholder="Search across all course content..."
-            enableSemantic={true}
-            className="w-full"
-          />
+            <SearchBar
+                placeholder="Search across all course content..."
+                enableSemantic={true}
+                className="w-full" />
         </div>
-      </div>
-
-      {/* Stats Grid */}
-<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    </div>
+    {/* Stats Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Total Courses"
-          value={dashboardData.stats.totalCourses}
-          icon="BookOpen"
-          gradient="bg-primary-600"
-          change="+2 this month"
-        />
+            title="Total Courses"
+            value={dashboardData.stats.totalCourses}
+            icon="BookOpen"
+            gradient="bg-primary-600"
+            change="+2 this month" />
         <StatCard
-          title="Active Students"
-          value={dashboardData.stats.totalStudents}
-          icon="Users"
-          gradient="bg-secondary-600"
-          change="+12% this week"
-        />
+            title="Active Students"
+            value={dashboardData.stats.totalStudents}
+            icon="Users"
+            gradient="bg-secondary-600"
+            change="+12% this week" />
         <StatCard
-          title="Pending Reviews"
-          value={dashboardData.stats.pendingReviews}
-          icon="MessageSquare"
-          gradient="bg-warning-600"
-          change="2 urgent"
-        />
+            title="Pending Reviews"
+            value={dashboardData.stats.pendingReviews}
+            icon="MessageSquare"
+            gradient="bg-warning-600"
+            change="2 urgent" />
         <StatCard
-          title="Deliverables"
-          value={dashboardData.stats.completedDeliverables}
-          icon="Award"
-          gradient="bg-success-600"
-          change="+8 this week"
-        />
+            title="Deliverables"
+            value={dashboardData.stats.completedDeliverables}
+            icon="Award"
+            gradient="bg-success-600"
+            change="+8 this week" />
         <StatCard
-          title="Avg Progress"
-          value={`${dashboardData.stats.averageProgress}%`}
-          icon="TrendingUp"
-          gradient="bg-accent-600"
-          change={`${dashboardData.stats.activeStudentsToday} active today`}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-{/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Platform activity since your last login</CardDescription>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-xs text-gray-500">
-                  Last updated: {new Date().toLocaleTimeString()}
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => window.location.reload()}
-                >
-                  <ApperIcon name="RefreshCw" className="h-4 w-4 mr-2" />
-                  Refresh
-                </Button>
-              </div>
+            title="Avg Progress"
+            value={`${dashboardData.stats.averageProgress}%`}
+            icon="TrendingUp"
+            gradient="bg-accent-600"
+            change={`${dashboardData.stats.activeStudentsToday} active today`} />
+    </div>
+    {/* Quick Actions */}
+    <Card className="mb-8">
+        <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common tasks and shortcuts</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-20 flex-col"
+                    onClick={() => navigate("/courses/new")}>
+                    <ApperIcon name="Plus" className="h-6 w-6 mb-2" />Create Course
+                                </Button>
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-20 flex-col"
+                    onClick={() => navigate("/students")}>
+                    <ApperIcon name="UserPlus" className="h-6 w-6 mb-2" />Add Student
+                                </Button>
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-20 flex-col"
+                    onClick={() => navigate("/reviews")}>
+                    <ApperIcon name="Eye" className="h-6 w-6 mb-2" />Review Submissions
+                                </Button>
+                <Button
+                    variant="outline"
+                    size="lg"
+                    className="h-20 flex-col"
+                    onClick={() => navigate("/deliverables")}>
+                    <ApperIcon name="Award" className="h-6 w-6 mb-2" />View Deliverables
+                                </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            {dashboardData.activities.length === 0 ? (
-              <div className="text-center py-8">
-                <ApperIcon name="Activity" className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">No recent activity to display</p>
-                <p className="text-sm text-gray-400">Activity will appear here as users interact with the platform</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {dashboardData.activities.map((activity, index) => {
-const getActivityColor = (type) => {
-                    switch (type) {
-                      case "submission":
-                        return "bg-blue-600"
-                      case "login":
-                        return "bg-green-600"
-                      case "payment":
-                        return "bg-purple-600"
-                      case "enrollment":
-                        return "bg-orange-600"
-                      default:
-                        return "bg-gray-600"
-                    }
-                  }
-
-
-                  return (
-<motion.div
-                      key={activity.Id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className={`h-10 w-10 ${getActivityColor(activity.type)} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                        <ApperIcon name={activity.icon} className="h-5 w-5 text-white" />
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-medium text-gray-900 truncate">
-                            {activity.title}
-                          </h4>
-                          <span className="text-xs text-gray-500 flex-shrink-0">
-                            {getTimeAgo(activity.timestamp)}
-                          </span>
+        </CardContent>
+    </Card>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
+        <Card>
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <CardTitle>Recent Activity</CardTitle>
+                        <CardDescription>Platform activity since your last login</CardDescription>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="text-xs text-gray-500">Last updated: {new Date().toLocaleTimeString()}
                         </div>
-                        
-                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
-                          {activity.description}
-                        </p>
-                        
-                        <div className="flex items-center mt-2 space-x-3">
-                          {activity.user && (
-                            <UserAvatar 
-                              user={activity.user} 
-                              size="sm" 
-                              className="flex-shrink-0" 
-                            />
-                          )}
-                          
-                          {activity.status && (
-                            <StatusBadge 
-                              status={activity.status} 
-                              type={activity.type} 
-                              size="sm"
-                            />
-                          )}
-                          
-                          {activity.metadata?.amount && (
-                            <span className="text-xs font-medium text-green-600">
-                              ${activity.metadata.amount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )
-                }).slice(0, showAllActivities ? dashboardData.activities.length : 5)}
-                
-                {dashboardData.activities.length > 5 && (
-                  <div className="pt-3 border-t border-gray-100">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowAllActivities(!showAllActivities)}
-                      className="w-full justify-center"
-                    >
-                      <ApperIcon 
-                        name={showAllActivities ? "ChevronUp" : "ChevronDown"} 
-                        className="h-4 w-4 mr-2" 
-                      />
-                      {showAllActivities ? "Show less" : `Show more (${dashboardData.activities.length - 5} remaining)`}
-                    </Button>
-                  </div>
-                )}
-                
-<div className="pt-3 border-t border-gray-100 mt-4">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                    <div>
-                      <div className="text-lg font-semibold text-blue-600">
-                        {dashboardData.activityStats.todaySubmissions || 0}
-                      </div>
-                      <div className="text-xs text-gray-500">Submissions Today</div>
+                        <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                            <ApperIcon name="RefreshCw" className="h-4 w-4 mr-2" />Refresh
+                                            </Button>
                     </div>
-                    <div>
-                      <div className="text-lg font-semibold text-green-600">
-                        {dashboardData.activityStats.todayLogins || 0}
-                      </div>
-                      <div className="text-xs text-gray-500">Logins Today</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold text-purple-600">
-                        {dashboardData.activityStats.todayPayments || 0}
-                      </div>
-                      <div className="text-xs text-gray-500">Payments Today</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold text-orange-600">
-                        {dashboardData.activityStats.todayEnrollments || 0}
-                      </div>
-                      <div className="text-xs text-gray-500">New Members Today</div>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent>
+                {dashboardData.activities.length === 0 ? <div className="text-center py-8">
+                    <ApperIcon name="Activity" className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+                    <p className="text-gray-500">No recent activity to display</p>
+                    <p className="text-sm text-gray-400">Activity will appear here as users interact with the platform</p>
+                </div> : <div className="space-y-4">
+                    {dashboardData.activities.map((activity, index) => {
+                        const getActivityColor = type => {
+                            switch (type) {
+                            case "submission":
+                                return "bg-blue-600";
+                            case "login":
+                                return "bg-green-600";
+                            case "payment":
+                                return "bg-purple-600";
+                            case "enrollment":
+                                return "bg-orange-600";
+                            default:
+                                return "bg-gray-600";
+                            }
+                        };
 
+                        return (
+                            <motion.div
+                                key={activity.Id}
+                                initial={{
+                                    opacity: 0,
+                                    x: -20
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    x: 0
+                                }}
+                                transition={{
+                                    delay: index * 0.1
+                                }}
+                                className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                                <div
+                                    className={`h-10 w-10 ${getActivityColor(activity.type)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                                    <ApperIcon name={activity.icon} className="h-5 w-5 text-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <h4 className="text-sm font-medium text-gray-900 truncate">
+                                            {activity.title}
+                                        </h4>
+                                        <span className="text-xs text-gray-500 flex-shrink-0">
+                                            {getTimeAgo(activity.timestamp)}
+                                        </span>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                        {activity.description}
+                                    </p>
+                                    <div className="flex items-center mt-2 space-x-3">
+                                        {activity.user && <UserAvatar user={activity.user} size="sm" className="flex-shrink-0" />}
+                                        {activity.status && <StatusBadge status={activity.status} type={activity.type} size="sm" />}
+                                        {activity.metadata?.amount && <span className="text-xs font-medium text-green-600">${activity.metadata.amount}
+                                        </span>}
+                                    </div>
+                                </div>
+                            </motion.div>
+                        );
+                    }).slice(0, showAllActivities ? dashboardData.activities.length : 5)}
+                    {dashboardData.activities.length > 5 && <div className="pt-3 border-t border-gray-100">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAllActivities(!showAllActivities)}
+                            className="w-full justify-center">
+                            <ApperIcon
+                                name={showAllActivities ? "ChevronUp" : "ChevronDown"}
+                                className="h-4 w-4 mr-2" />
+                            {showAllActivities ? "Show less" : `Show more (${dashboardData.activities.length - 5} remaining)`}
+                        </Button>
+                    </div>}
+                    <div className="pt-3 border-t border-gray-100 mt-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                            <div>
+                                <div className="text-lg font-semibold text-blue-600">
+                                    {dashboardData.activityStats.todaySubmissions || 0}
+                                </div>
+                                <div className="text-xs text-gray-500">Submissions Today</div>
+                            </div>
+                            <div>
+                                <div className="text-lg font-semibold text-green-600">
+                                    {dashboardData.activityStats.todayLogins || 0}
+                                </div>
+                                <div className="text-xs text-gray-500">Logins Today</div>
+                            </div>
+                            <div>
+                                <div className="text-lg font-semibold text-purple-600">
+                                    {dashboardData.activityStats.todayPayments || 0}
+                                </div>
+                                <div className="text-xs text-gray-500">Payments Today</div>
+                            </div>
+                            <div>
+                                <div className="text-lg font-semibold text-orange-600">
+                                    {dashboardData.activityStats.todayEnrollments || 0}
+                                </div>
+                                <div className="text-xs text-gray-500">New Members Today</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>}
+            </CardContent>
+        </Card>
         {/* Recent Submissions */}
         <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Recent Submissions</CardTitle>
-                <CardDescription>Latest student work</CardDescription>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate("/reviews")}
-              >
-                Review All
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {dashboardData.recentSubmissions.map((submission, index) => (
-              <motion.div
-                key={submission.Id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
-                onClick={() => navigate(`/submissions/${submission.Id}`)}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-accent-600 rounded-lg flex items-center justify-center">
-                    <ApperIcon name="FileText" className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-gray-900">
-                      Lesson {submission.lessonId} Submission
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      Student {submission.studentId} • {new Date(submission.submittedAt).toLocaleDateString()}
-                    </p>
-                  </div>
+            <CardHeader>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <CardTitle>Recent Submissions</CardTitle>
+                        <CardDescription>Latest student work</CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => navigate("/reviews")}>Review All
+                                      </Button>
                 </div>
-                <StatusBadge status={submission.status} type="submission" />
-              </motion.div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Students Overview */}
-{/* Student Progress Overview */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Student Progress Overview</CardTitle>
-              <CardDescription>Track individual student progress and completion</CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/students')}
-            >
-              <ApperIcon name="Users" className="h-4 w-4 mr-2" />
-              View All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {dashboardData.students.map((student, index) => {
-              const enrollment = dashboardData.enrollments.find(e => e.userId === student.Id)
-              const progress = enrollment?.progress?.overallProgress || 0
-              const currentLesson = enrollment?.progress?.currentLesson || "Not started"
-
-              return (
-                <motion.div
-                  key={student.Id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-className="flex items-center space-x-4 p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
-                  onClick={() => navigate(`/students/${student.Id}`)}
-                >
-                  <UserAvatar user={student} size="md" />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-gray-900 truncate">{student.name}</h4>
-                    <p className="text-sm text-gray-500 truncate">{currentLesson}</p>
-                    <div className="flex items-center mt-1">
-                      <div className="flex-1 bg-gray-200 rounded-full h-2 mr-3">
-<div 
-                          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                      <span className="text-xs font-medium text-gray-600">{progress}%</span>
-                    </div>
-                  </div>
-                  <ProgressRing progress={progress} size={40} strokeWidth={3} />
-                </motion.div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent Student Activity */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Recent Student Activity</CardTitle>
-              <CardDescription>Last student sign-ins and activity status</CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/students')}
-            >
-              <ApperIcon name="Activity" className="h-4 w-4 mr-2" />
-              View Details
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {dashboardData.recentLogins.slice(0, 6).map((student, index) => {
-              const isActiveToday = student.lastLoginAt && new Date(student.lastLoginAt) > new Date(Date.now() - 24 * 60 * 60 * 1000);
-              const lastSeen = student.lastLoginAt ? getTimeAgo(student.lastLoginAt) : "Never";
-              
-return (
-                <motion.div
-                  key={student.Id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="relative">
-                      <UserAvatar user={student} size="sm" />
-                      <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
-                        isActiveToday ? 'bg-green-500' : 'bg-gray-400'
-                      }`} />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{student.name}</p>
-                      <p className="text-sm text-gray-500">Last seen: {lastSeen}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <StatusBadge 
-                      status={isActiveToday ? 'active' : 'inactive'} 
-                      text={isActiveToday ? 'Active' : 'Inactive'} 
-                    />
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Student Deliverables Summary */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Student Deliverables</CardTitle>
-              <CardDescription>Track submissions and deliverables from each student</CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/deliverables')}
-            >
-              <ApperIcon name="Package" className="h-4 w-4 mr-2" />
-              View All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {dashboardData.students.map((student, index) => {
-              const deliverables = dashboardData.studentDeliverables[student.Id] || { total: 0, pending: 0, approved: 0, changes: 0 };
-              
-              return (
-                <motion.div
-                  key={student.Id}
-initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200"
-                >
-                  <div className="flex items-center space-x-3">
-                    <UserAvatar user={student} size="sm" />
-                    <div>
-                      <p className="font-medium text-gray-900">{student.name}</p>
-                      <p className="text-sm text-gray-500">{deliverables.total} total submissions</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-warning-600">{deliverables.pending}</div>
-                      <div className="text-xs text-gray-500">Pending</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-success-600">{deliverables.approved}</div>
-                      <div className="text-xs text-gray-500">Approved</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-error-600">{deliverables.changes}</div>
-                      <div className="text-xs text-gray-500">Changes</div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/students/${student.Id}/submissions`)}
-                    >
-                      <ApperIcon name="ExternalLink" className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Unread Messages */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Unread Messages</CardTitle>
-              <CardDescription>Recent unread comments and conversations</CardDescription>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/chat')}
-            >
-              <ApperIcon name="MessageCircle" className="h-4 w-4 mr-2" />
-              View All
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {dashboardData.unreadComments.length === 0 ? (
-              <div className="text-center py-8">
-                <ApperIcon name="MessageSquare" className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500">No unread messages</p>
-              </div>
-            ) : (
-              dashboardData.unreadComments.map((comment, index) => {
-                const author = dashboardData.students.find(s => s.Id === comment.authorId) || 
-                              { name: "Unknown User", Id: comment.authorId };
-                
-                return (
-                  <motion.div
-                    key={comment.Id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
-                    onClick={() => {
-                      navigate(`/submissions/${comment.submissionId}`);
-                      toast.success("Navigated to conversation");
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {dashboardData.recentSubmissions.map((submission, index) => <motion.div
+                    key={submission.Id}
+                    initial={{
+                        opacity: 0,
+                        y: 20
                     }}
-                  >
-                    <UserAvatar user={author} size="sm" />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="font-medium text-gray-900">{author.name}</p>
-                        <span className="text-xs text-gray-500">{getTimeAgo(comment.createdAt)}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 line-clamp-2">{comment.text}</p>
-<div className="flex items-center mt-2">
-                        <div className="w-2 h-2 bg-primary-600 rounded-full mr-2" />
-                        <span className="text-xs text-primary-700 font-medium">Unread</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                )
-              })
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-{/* AI Coach Responses Section */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <ApperIcon name="Brain" className="h-5 w-5 text-primary-600" />
-                AI Coach Responses
-              </CardTitle>
-              <CardDescription>Monitor AI coach interactions and provide human oversight</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="text-xs text-gray-500">
-                {dashboardData.aiCoachResponses.filter(r => !r.isUserOverride).length} AI • {dashboardData.aiCoachResponses.filter(r => r.isUserOverride).length} User
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => navigate("/ai-coaches")}
-              >
-                <ApperIcon name="Settings" className="h-4 w-4 mr-2" />
-                Manage Coaches
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {dashboardData.aiCoachResponses.length === 0 ? (
-            <div className="text-center py-8">
-              <ApperIcon name="MessageSquare" className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500">No AI coach responses yet</p>
-              <p className="text-sm text-gray-400">AI responses will appear here as students interact with coaches</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {dashboardData.aiCoachResponses
-                .slice(0, showAllAIResponses ? dashboardData.aiCoachResponses.length : 4)
-                .map((response, index) => (
-                <motion.div
-                  key={response.Id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 hover:bg-gray-50 transition-all duration-200"
-                >
-                  {/* Header with student and coach info */}
-                  <div className="flex items-center justify-between mb-3">
+                    animate={{
+                        opacity: 1,
+                        y: 0
+                    }}
+                    transition={{
+                        delay: index * 0.1
+                    }}
+                    className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                    onClick={() => navigate(`/submissions/${submission.Id}`)}>
                     <div className="flex items-center space-x-3">
-                      <UserAvatar 
-                        user={{ name: response.studentName, Id: response.studentId }} 
-                        size="sm" 
-                      />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-medium text-gray-900">{response.studentName}</h4>
-                          <ApperIcon name="ArrowRight" className="h-3 w-3 text-gray-400" />
-                          <span className="text-sm text-primary-600 font-medium">{response.coachName}</span>
+                        <div
+                            className="h-10 w-10 bg-accent-600 rounded-lg flex items-center justify-center">
+                            <ApperIcon name="FileText" className="h-5 w-5 text-white" />
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <span>{response.courseTitle}</span>
-                          <span>•</span>
-                          <span>{getTimeAgo(response.timestamp)}</span>
+                        <div>
+                            <h4 className="font-medium text-gray-900">Lesson {submission.lessonId}Submission
+                                                    </h4>
+                            <p className="text-sm text-gray-500">Student {submission.studentId}• {new Date(submission.submittedAt).toLocaleDateString()}
+                            </p>
                         </div>
-                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {response.isUserOverride ? (
-                        <div className="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                          <ApperIcon name="User" className="h-3 w-3" />
-                          User Override
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                          <ApperIcon name="Brain" className="h-3 w-3" />
-                          AI Response
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Student Question */}
-                  <div className="mb-3">
-                    <div className="text-xs font-medium text-gray-500 mb-1">STUDENT QUESTION:</div>
-                    <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg italic">
-                      "{response.question}"
-                    </div>
-                  </div>
-
-                  {/* AI Response */}
-                  {!response.isUserOverride && (
-                    <div className="mb-3">
-                      <div className="text-xs font-medium text-gray-500 mb-1">AI COACH RESPONSE:</div>
-                      <div className="text-sm text-gray-700 bg-primary-50 p-3 rounded-lg border-l-4 border-primary-200">
-                        {response.aiResponse}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* User Override Response */}
-                  {response.isUserOverride && response.userResponse && (
-                    <div className="mb-3">
-                      <div className="text-xs font-medium text-gray-500 mb-1">YOUR RESPONSE (OVERRIDING AI):</div>
-                      <div className="text-sm text-gray-700 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-200">
-                        {response.userResponse}
-                      </div>
-                      {response.aiResponse && (
-                        <details className="mt-2">
-                          <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
-                            View original AI response
-                          </summary>
-                          <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg mt-2 border">
-                            {response.aiResponse}
-                          </div>
-                        </details>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Action buttons */}
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-onClick={() => {
-                          navigate(`/ai-coach-chat/${response.studentId}/${response.Id}`);
-                          toast.success("Opened AI coach conversation");
-                        }}
-                        className="text-xs"
-                      >
-                        <ApperIcon name="MessageCircle" className="h-3 w-3 mr-1" />
-                        View Chat
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          navigator.clipboard.writeText(response.question);
-                          toast.success("Question copied to clipboard");
-                        }}
-                        className="text-xs"
-                      >
-                        <ApperIcon name="Copy" className="h-3 w-3 mr-1" />
-                        Copy Question
-                      </Button>
-                    </div>
-                    
-                    {!response.isUserOverride && (
-<Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          // Navigate to AI coach chat with takeover context
-                          navigate(`/ai-coach-chat/${response.studentId}/${response.Id}?takeover=true`);
-                          // Simulate user intervention
-                          const updatedResponses = dashboardData.aiCoachResponses.map(r => 
-                            r.Id === response.Id 
-                              ? { ...r, isUserOverride: true, status: 'user_override', userResponse: 'User is now handling this conversation directly.' }
-                              : r
-                          );
-                          setDashboardData(prev => ({
-                            ...prev,
-                            aiCoachResponses: updatedResponses
-                          }));
-                          toast.success("Taking over conversation - opening AI coach chat");
-                        }}
-                        className="text-xs"
-                      >
-                        <ApperIcon name="User" className="h-3 w-3 mr-1" />
-                        Take Over
-                      </Button>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-              
-              {dashboardData.aiCoachResponses.length > 4 && (
-                <div className="pt-3 border-t border-gray-100">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowAllAIResponses(!showAllAIResponses)}
-                    className="w-full justify-center"
-                  >
-                    <ApperIcon 
-                      name={showAllAIResponses ? "ChevronUp" : "ChevronDown"} 
-                      className="h-4 w-4 mr-2" 
-                    />
-                    {showAllAIResponses ? "Show less" : `Show more (${dashboardData.aiCoachResponses.length - 4} remaining)`}
-                  </Button>
-                </div>
-              )}
-
-              {/* AI Coach Activity Summary */}
-              <div className="pt-3 border-t border-gray-100 mt-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                  <div>
-                    <div className="text-lg font-semibold text-green-600">
-                      {dashboardData.aiCoachResponses.filter(r => !r.isUserOverride).length}
-                    </div>
-                    <div className="text-xs text-gray-500">AI Handled</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-blue-600">
-                      {dashboardData.aiCoachResponses.filter(r => r.isUserOverride).length}
-                    </div>
-                    <div className="text-xs text-gray-500">User Override</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-purple-600">
-                      {new Set(dashboardData.aiCoachResponses.map(r => r.studentId)).size}
-                    </div>
-                    <div className="text-xs text-gray-500">Students Helped</div>
-                  </div>
-                  <div>
-                    <div className="text-lg font-semibold text-orange-600">
-                      {dashboardData.aiCoachResponses.filter(r => 
-                        new Date(r.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000)
-                      ).length}
-                    </div>
-                    <div className="text-xs text-gray-500">Today</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-{/* Quick Actions */}
-      <Card>
+                    <StatusBadge status={submission.status} type="submission" />
+                </motion.div>)}
+            </CardContent>
+        </Card>
+    </div>
+    {/* Students Overview */}
+    {/* Student Progress Overview */}
+    <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-          <CardDescription>Common tasks and shortcuts</CardDescription>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Student Progress Overview</CardTitle>
+                    <CardDescription>Track individual student progress and completion</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/students")}>
+                    <ApperIcon name="Users" className="h-4 w-4 mr-2" />View All
+                                </Button>
+            </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button
-              variant="outline"
-              className="flex items-center justify-center h-24 flex-col space-y-2"
-              onClick={() => navigate('/search')}
-            >
-              <ApperIcon name="Search" className="h-6 w-6" />
-              <span>Semantic Search</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-20 flex-col"
-              onClick={() => navigate("/courses/new")}
-            >
-              <ApperIcon name="Plus" className="h-6 w-6 mb-2" />
-              Create Course
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-20 flex-col"
-              onClick={() => navigate("/students")}
-            >
-              <ApperIcon name="UserPlus" className="h-6 w-6 mb-2" />
-              Add Student
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-20 flex-col"
-              onClick={() => navigate("/reviews")}
-            >
-              <ApperIcon name="Eye" className="h-6 w-6 mb-2" />
-              Review Submissions
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-20 flex-col"
-              onClick={() => navigate("/deliverables")}
-            >
-              <ApperIcon name="Award" className="h-6 w-6 mb-2" />
-              View Deliverables
-            </Button>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {dashboardData.students.map((student, index) => {
+                    const enrollment = dashboardData.enrollments.find(e => e.userId === student.Id);
+                    const progress = enrollment?.progress?.overallProgress || 0;
+                    const currentLesson = enrollment?.progress?.currentLesson || "Not started";
+
+                    return (
+                        <motion.div
+                            key={student.Id}
+                            initial={{
+                                opacity: 0,
+                                y: 20
+                            }}
+                            animate={{
+                                opacity: 1,
+                                y: 0
+                            }}
+                            transition={{
+                                delay: index * 0.1
+                            }}
+                            className="flex items-center space-x-4 p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
+                            onClick={() => navigate(`/students/${student.Id}`)}>
+                            <UserAvatar user={student} size="md" />
+                            <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-gray-900 truncate">{student.name}</h4>
+                                <p className="text-sm text-gray-500 truncate">{currentLesson}</p>
+                                <div className="flex items-center mt-1">
+                                    <div className="flex-1 bg-gray-200 rounded-full h-2 mr-3">
+                                        <div
+                                            className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                                            style={{
+                                                width: `${progress}%`
+                                            }} />
+                                    </div>
+                                    <span className="text-xs font-medium text-gray-600">{progress}%</span>
+                                </div>
+                            </div>
+                            <ProgressRing progress={progress} size={40} strokeWidth={3} />
+                        </motion.div>
+                    );
+                })}
+            </div>
         </CardContent>
-      </Card>
-    </div>
+    </Card>
+    {/* Recent Student Activity */}
+    <Card>
+        <CardHeader>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Recent Student Activity</CardTitle>
+                    <CardDescription>Last student sign-ins and activity status</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/students")}>
+                    <ApperIcon name="Activity" className="h-4 w-4 mr-2" />View Details
+                                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-3">
+                {dashboardData.recentLogins.slice(0, 6).map((student, index) => {
+                    const isActiveToday = student.lastLoginAt && new Date(student.lastLoginAt) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                    const lastSeen = student.lastLoginAt ? getTimeAgo(student.lastLoginAt) : "Never";
+
+                    return (
+                        <motion.div
+                            key={student.Id}
+                            initial={{
+                                opacity: 0,
+                                x: -20
+                            }}
+                            animate={{
+                                opacity: 1,
+                                x: 0
+                            }}
+                            transition={{
+                                delay: index * 0.05
+                            }}
+                            className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                            <div className="flex items-center space-x-3">
+                                <div className="relative">
+                                    <UserAvatar user={student} size="sm" />
+                                    <div
+                                        className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isActiveToday ? "bg-green-500" : "bg-gray-400"}`} />
+                                </div>
+                                <div>
+                                    <p className="font-medium text-gray-900">{student.name}</p>
+                                    <p className="text-sm text-gray-500">Last seen: {lastSeen}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <StatusBadge
+                                    status={isActiveToday ? "active" : "inactive"}
+                                    text={isActiveToday ? "Active" : "Inactive"} />
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </CardContent>
+    </Card>
+    {/* Student Deliverables Summary */}
+    <Card>
+        <CardHeader>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Student Deliverables</CardTitle>
+                    <CardDescription>Track submissions and deliverables from each student</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/deliverables")}>
+                    <ApperIcon name="Package" className="h-4 w-4 mr-2" />View All
+                                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-4">
+                {dashboardData.students.map((student, index) => {
+                    const deliverables = dashboardData.studentDeliverables[student.Id] || {
+                        total: 0,
+                        pending: 0,
+                        approved: 0,
+                        changes: 0
+                    };
+
+                    return (
+                        <motion.div
+                            key={student.Id}
+                            initial={{
+                                opacity: 0,
+                                scale: 0.95
+                            }}
+                            animate={{
+                                opacity: 1,
+                                scale: 1
+                            }}
+                            transition={{
+                                delay: index * 0.05
+                            }}
+                            className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200">
+                            <div className="flex items-center space-x-3">
+                                <UserAvatar user={student} size="sm" />
+                                <div>
+                                    <p className="font-medium text-gray-900">{student.name}</p>
+                                    <p className="text-sm text-gray-500">{deliverables.total}total submissions</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center space-x-4">
+                                <div className="text-center">
+                                    <div className="text-lg font-semibold text-warning-600">{deliverables.pending}</div>
+                                    <div className="text-xs text-gray-500">Pending</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-lg font-semibold text-success-600">{deliverables.approved}</div>
+                                    <div className="text-xs text-gray-500">Approved</div>
+                                </div>
+                                <div className="text-center">
+                                    <div className="text-lg font-semibold text-error-600">{deliverables.changes}</div>
+                                    <div className="text-xs text-gray-500">Changes</div>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => navigate(`/students/${student.Id}/submissions`)}>
+                                    <ApperIcon name="ExternalLink" className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </CardContent>
+    </Card>
+    {/* Unread Messages */}
+    <Card>
+        <CardHeader>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle>Unread Messages</CardTitle>
+                    <CardDescription>Recent unread comments and conversations</CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => navigate("/chat")}>
+                    <ApperIcon name="MessageCircle" className="h-4 w-4 mr-2" />View All
+                                </Button>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <div className="space-y-3">
+                {dashboardData.unreadComments.length === 0 ? <div className="text-center py-8">
+                    <ApperIcon name="MessageSquare" className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-500">No unread messages</p>
+                </div> : dashboardData.unreadComments.map((comment, index) => {
+                    const author = dashboardData.students.find(s => s.Id === comment.authorId) || {
+                        name: "Unknown User",
+                        Id: comment.authorId
+                    };
+
+                    return (
+                        <motion.div
+                            key={comment.Id}
+                            initial={{
+                                opacity: 0,
+                                y: 10
+                            }}
+                            animate={{
+                                opacity: 1,
+                                y: 0
+                            }}
+                            transition={{
+                                delay: index * 0.05
+                            }}
+                            className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                            onClick={() => {
+                                navigate(`/submissions/${comment.submissionId}`);
+                                toast.success("Navigated to conversation");
+                            }}>
+                            <UserAvatar user={author} size="sm" />
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between">
+                                    <p className="font-medium text-gray-900">{author.name}</p>
+                                    <span className="text-xs text-gray-500">{getTimeAgo(comment.createdAt)}</span>
+                                </div>
+                                <p className="text-sm text-gray-600 line-clamp-2">{comment.text}</p>
+                                <div className="flex items-center mt-2">
+                                    <div className="w-2 h-2 bg-primary-600 rounded-full mr-2" />
+                                    <span className="text-xs text-primary-700 font-medium">Unread</span>
+                                </div>
+                            </div>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </CardContent>
+    </Card>
+    {/* AI Coach Responses Section */}
+    <Card>
+        <CardHeader>
+            <div className="flex items-center justify-between">
+                <div>
+                    <CardTitle className="flex items-center gap-2">
+                        <ApperIcon name="Brain" className="h-5 w-5 text-primary-600" />AI Coach Responses
+                                      </CardTitle>
+                    <CardDescription>Monitor AI coach interactions and provide human oversight</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="text-xs text-gray-500">
+                        {dashboardData.aiCoachResponses.filter(r => !r.isUserOverride).length}AI • {dashboardData.aiCoachResponses.filter(r => r.isUserOverride).length}User
+                                      </div>
+                    <Button variant="outline" size="sm" onClick={() => navigate("/ai-coaches")}>
+                        <ApperIcon name="Settings" className="h-4 w-4 mr-2" />Manage Coaches
+                                      </Button>
+                </div>
+            </div>
+        </CardHeader>
+        <CardContent>
+            {dashboardData.aiCoachResponses.length === 0 ? <div className="text-center py-8">
+                <ApperIcon name="MessageSquare" className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No AI coach responses yet</p>
+                <p className="text-sm text-gray-400">AI responses will appear here as students interact with coaches</p>
+            </div> : <div className="space-y-4">
+                {dashboardData.aiCoachResponses.slice(0, showAllAIResponses ? dashboardData.aiCoachResponses.length : 4).map((response, index) => <motion.div
+                    key={response.Id}
+                    initial={{
+                        opacity: 0,
+                        y: 20
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0
+                    }}
+                    transition={{
+                        delay: index * 0.1
+                    }}
+                    className="border border-gray-100 rounded-lg p-4 hover:border-gray-200 hover:bg-gray-50 transition-all duration-200">
+                    {/* Header with student and coach info */}
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                            <UserAvatar
+                                user={{
+                                    name: response.studentName,
+                                    Id: response.studentId
+                                }}
+                                size="sm" />
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <h4 className="font-medium text-gray-900">{response.studentName}</h4>
+                                    <ApperIcon name="ArrowRight" className="h-3 w-3 text-gray-400" />
+                                    <span className="text-sm text-primary-600 font-medium">{response.coachName}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-xs text-gray-500">
+                                    <span>{response.courseTitle}</span>
+                                    <span>•</span>
+                                    <span>{getTimeAgo(response.timestamp)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {response.isUserOverride ? <div
+                                className="flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                <ApperIcon name="User" className="h-3 w-3" />User Override
+                                                        </div> : <div
+                                className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                <ApperIcon name="Brain" className="h-3 w-3" />AI Response
+                                                        </div>}
+                        </div>
+                    </div>
+                    {/* Student Question */}
+                    <div className="mb-3">
+                        <div className="text-xs font-medium text-gray-500 mb-1">STUDENT QUESTION:</div>
+                        <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg italic">"{response.question}"
+                                                </div>
+                    </div>
+                    {/* AI Response */}
+                    {!response.isUserOverride && <div className="mb-3">
+                        <div className="text-xs font-medium text-gray-500 mb-1">AI COACH RESPONSE:</div>
+                        <div
+                            className="text-sm text-gray-700 bg-primary-50 p-3 rounded-lg border-l-4 border-primary-200">
+                            {response.aiResponse}
+                        </div>
+                    </div>}
+                    {/* User Override Response */}
+                    {response.isUserOverride && response.userResponse && <div className="mb-3">
+                        <div className="text-xs font-medium text-gray-500 mb-1">YOUR RESPONSE (OVERRIDING AI):</div>
+                        <div
+                            className="text-sm text-gray-700 bg-blue-50 p-3 rounded-lg border-l-4 border-blue-200">
+                            {response.userResponse}
+                        </div>
+                        {response.aiResponse && <details className="mt-2">
+                            <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">View original AI response
+                                                          </summary>
+                            <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg mt-2 border">
+                                {response.aiResponse}
+                            </div>
+                        </details>}
+                    </div>}
+                    {/* Action buttons */}
+                    <div
+                        className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    navigate(`/ai-coach-chat/${response.studentId}/${response.Id}`);
+                                    toast.success("Opened AI coach conversation");
+                                }}
+                                className="text-xs">
+                                <ApperIcon name="MessageCircle" className="h-3 w-3 mr-1" />View Chat
+                                                      </Button>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(response.question);
+                                    toast.success("Question copied to clipboard");
+                                }}
+                                className="text-xs">
+                                <ApperIcon name="Copy" className="h-3 w-3 mr-1" />Copy Question
+                                                      </Button>
+                        </div>
+                        {!response.isUserOverride && <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                navigate(`/ai-coach-chat/${response.studentId}/${response.Id}?takeover=true`);
+
+                                const updatedResponses = dashboardData.aiCoachResponses.map(r => r.Id === response.Id ? {
+                                    ...r,
+                                    isUserOverride: true,
+                                    status: "user_override",
+                                    userResponse: "User is now handling this conversation directly."
+                                } : r);
+
+                                setDashboardData(prev => ({
+                                    ...prev,
+                                    aiCoachResponses: updatedResponses
+                                }));
+
+                                toast.success("Taking over conversation - opening AI coach chat");
+                            }}
+                            className="text-xs">
+                            <ApperIcon name="User" className="h-3 w-3 mr-1" />Take Over
+                                                  </Button>}
+                    </div>
+                </motion.div>)}
+                {dashboardData.aiCoachResponses.length > 4 && <div className="pt-3 border-t border-gray-100">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAllAIResponses(!showAllAIResponses)}
+                        className="w-full justify-center">
+                        <ApperIcon
+                            name={showAllAIResponses ? "ChevronUp" : "ChevronDown"}
+                            className="h-4 w-4 mr-2" />
+                        {showAllAIResponses ? "Show less" : `Show more (${dashboardData.aiCoachResponses.length - 4} remaining)`}
+                    </Button>
+                </div>}
+                {/* AI Coach Activity Summary */}
+                <div className="pt-3 border-t border-gray-100 mt-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div className="text-lg font-semibold text-green-600">
+                                {dashboardData.aiCoachResponses.filter(r => !r.isUserOverride).length}
+                            </div>
+                            <div className="text-xs text-gray-500">AI Handled</div>
+                        </div>
+                        <div>
+                            <div className="text-lg font-semibold text-blue-600">
+                                {dashboardData.aiCoachResponses.filter(r => r.isUserOverride).length}
+                            </div>
+                            <div className="text-xs text-gray-500">User Override</div>
+                        </div>
+                        <div>
+                            <div className="text-lg font-semibold text-purple-600">
+                                {new Set(dashboardData.aiCoachResponses.map(r => r.studentId)).size}
+                            </div>
+                            <div className="text-xs text-gray-500">Students Helped</div>
+                        </div>
+                        <div>
+                            <div className="text-lg font-semibold text-orange-600">
+                                {dashboardData.aiCoachResponses.filter(r => new Date(r.timestamp) > new Date(Date.now() - 24 * 60 * 60 * 1000)).length}
+                            </div>
+                            <div className="text-xs text-gray-500">Today</div>
+                        </div>
+                    </div>
+                </div>
+            </div>}
+        </CardContent>
+    </Card>
+</div>
   )
 }
 
