@@ -22,8 +22,9 @@ import Button from "@/components/atoms/Button";
 const Dashboard = () => {
 const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [showAllActivities, setShowAllActivities] = useState(false);
+const [showAllActivities, setShowAllActivities] = useState(false);
   const [showAllAIResponses, setShowAllAIResponses] = useState(false);
+  const [showAllSubmissions, setShowAllSubmissions] = useState(false);
 const [currentUser, setCurrentUser] = useState(null);
 const [dashboardData, setDashboardData] = useState({
     activities: [],
@@ -193,7 +194,7 @@ const unreadComments = allComments
 setDashboardData({
         activities,
         activityStats,
-        recentSubmissions: submissions.slice(0, 5),
+recentSubmissions: submissions.slice(0, 3),
         students: students.slice(0, 8),
         enrollments,
         recentLogins,
@@ -412,8 +413,8 @@ return (
                                 </div>
                             </motion.div>
                         );
-                    }).slice(0, showAllActivities ? dashboardData.activities.length : 5)}
-                    {dashboardData.activities.length > 5 && <div className="pt-3 border-t border-gray-100">
+}).slice(0, showAllActivities ? dashboardData.activities.length : 3)}
+{dashboardData.activities.length > 3 && <div className="pt-3 border-t border-gray-100">
                         <Button
                             variant="ghost"
                             size="sm"
@@ -422,7 +423,7 @@ return (
                             <ApperIcon
                                 name={showAllActivities ? "ChevronUp" : "ChevronDown"}
                                 className="h-4 w-4 mr-2" />
-                            {showAllActivities ? "Show less" : `Show more (${dashboardData.activities.length - 5} remaining)`}
+                            {showAllActivities ? "Show less" : `Show more (${dashboardData.activities.length - 3} remaining)`}
                         </Button>
                     </div>}
                     <div className="pt-3 border-t border-gray-100 mt-4">
@@ -468,8 +469,8 @@ return (
                                       </Button>
                 </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-                {dashboardData.recentSubmissions.map((submission, index) => <motion.div
+<CardContent className="space-y-4">
+                {dashboardData.recentSubmissions.slice(0, showAllSubmissions ? dashboardData.recentSubmissions.length : 3).map((submission, index) => <motion.div
                     key={submission.Id}
                     initial={{
                         opacity: 0,
@@ -498,6 +499,18 @@ return (
                     </div>
                     <StatusBadge status={submission.status} type="submission" />
                 </motion.div>)}
+                {dashboardData.recentSubmissions.length > 3 && <div className="pt-3 border-t border-gray-100">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAllSubmissions(!showAllSubmissions)}
+                        className="w-full justify-center">
+                        <ApperIcon
+                            name={showAllSubmissions ? "ChevronUp" : "ChevronDown"}
+                            className="h-4 w-4 mr-2" />
+                        {showAllSubmissions ? "Show less" : `Show more (${dashboardData.recentSubmissions.length - 3} remaining)`}
+                    </Button>
+                </div>}
             </CardContent>
         </Card>
     </div>
