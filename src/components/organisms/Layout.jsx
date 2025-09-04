@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { useTheme } from "@/contexts/ThemeContext";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 import UserAvatar from "@/components/molecules/UserAvatar";
 import Button from "@/components/atoms/Button";
 const Layout = () => {
-  const { theme, toggleTheme } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const navigate = useNavigate()
@@ -140,7 +138,7 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
   )
 
   return (
-<div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+<div className="min-h-screen bg-white transition-colors">
       {/* Desktop Sidebar */}
 <motion.div 
         className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:overflow-y-auto lg:bg-white dark:bg-gray-800 lg:border-r lg:border-gray-100 dark:border-gray-700 transition-all duration-300 ${
@@ -182,14 +180,6 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
               <ApperIcon name={sidebarCollapsed ? "ChevronRight" : "ChevronLeft"} className="h-5 w-5" />
             </button>
             
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              <ApperIcon name={theme === 'light' ? "Moon" : "Sun"} className="h-5 w-5" />
-            </button>
           </div>
 
           {/* Navigation */}
@@ -232,11 +222,11 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-className="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-gray-800 border-r border-gray-100 dark:border-gray-700 lg:hidden"
+className="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 lg:hidden"
             >
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
-<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                   <div className="flex items-center">
                     <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
                       <ApperIcon name="GraduationCap" className="h-5 w-5 text-white" />
@@ -276,16 +266,7 @@ onClick={() => setSidebarOpen(false)}
       {/* Main Content */}
 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'}`}>
         {/* Mobile Header */}
-<div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 lg:hidden">
-          
-          {/* Mobile Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-          >
-            <ApperIcon name={theme === 'light' ? "Moon" : "Sun"} className="h-5 w-5" />
-          </button>
+<div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 bg-white lg:hidden">
 <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"

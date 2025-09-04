@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import React from "react";
-import { ThemeProvider } from "@/contexts/ThemeContext";
 import "@/index.css";
 import Layout from "@/components/organisms/Layout";
 import AICoachManager from "@/components/pages/AICoachManager";
@@ -27,9 +26,8 @@ import PlansAndBilling from "@/components/pages/PlansAndBilling";
 
 function App() {
   return (
-    <ThemeProvider>
       <BrowserRouter>
-        <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors">
+<div className="min-h-screen bg-white transition-colors">
 <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
@@ -77,7 +75,6 @@ function App() {
           />
         </div>
       </BrowserRouter>
-    </ThemeProvider>
   );
 }
 
