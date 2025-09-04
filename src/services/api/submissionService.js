@@ -32,11 +32,23 @@ async getAll() {
     return { ...submission }
   },
 
-  async getByStudentId(studentId) {
+async getByStudentId(studentId) {
     await delay()
     return submissions
       .filter(s => s.studentId === parseInt(studentId))
       .map(s => ({ ...s }))
+  },
+
+  async getSubmissionsByStudent() {
+    await delay()
+    const studentSubmissions = {};
+    submissions.forEach(submission => {
+      if (!studentSubmissions[submission.studentId]) {
+        studentSubmissions[submission.studentId] = [];
+      }
+      studentSubmissions[submission.studentId].push({ ...submission });
+    });
+    return studentSubmissions;
   },
 
   async getByStatus(status) {
@@ -106,6 +118,13 @@ export const commentService = {
     return comments
       .filter(c => c.submissionId === parseInt(submissionId))
       .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .map(c => ({ ...c }))
+  },
+
+  async getAllComments() {
+    await delay()
+    return [...comments]
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .map(c => ({ ...c }))
   },
 

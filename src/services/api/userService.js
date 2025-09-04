@@ -16,12 +16,19 @@ users.forEach(user => {
 export const userService = {
   async getAll() {
     await delay()
-    return [...users]
+    return [...users].map(user => ({
+      ...user,
+      lastLoginAt: user.lastLoginAt || getRandomRecentDate()
+    }))
   },
 
   async getRecentLogins(limit = 5) {
     await delay()
     return [...users]
+      .map(user => ({
+        ...user,
+        lastLoginAt: user.lastLoginAt || getRandomRecentDate()
+      }))
       .filter(u => u.lastLoginAt)
       .sort((a, b) => new Date(b.lastLoginAt) - new Date(a.lastLoginAt))
       .slice(0, limit)
@@ -67,8 +74,22 @@ export const userService = {
     return { ...deletedUser }
   },
 
-  async getByRole(role) {
+async getByRole(role) {
     await delay()
-    return users.filter(u => u.role === role).map(u => ({ ...u }))
+    return users.filter(u => u.role === role).map(u => ({
+      ...u,
+      lastLoginAt: u.lastLoginAt || getRandomRecentDate()
+    }))
   }
+}
+
+// Helper function to generate realistic recent login dates
+function getRandomRecentDate() {
+  const now = new Date();
+  const daysAgo = Math.floor(Math.random() * 7); // Within last 7 days
+  const hoursAgo = Math.floor(Math.random() * 24); // Random hour
+  const minutesAgo = Math.floor(Math.random() * 60); // Random minute
+  
+  const date = new Date(now - (daysAgo * 24 * 60 * 60 * 1000) - (hoursAgo * 60 * 60 * 1000) - (minutesAgo * 60 * 1000));
+  return date.toISOString();
 }

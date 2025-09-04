@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
 import { activityService } from "@/services/api/activityService";
 import { submissionService } from "@/services/api/submissionService";
+import { commentService } from "@/services/api/submissionService";
 import { userService } from "@/services/api/userService";
 import { enrollmentService } from "@/services/api/enrollmentService";
 import ApperIcon from "@/components/ApperIcon";
@@ -20,18 +21,23 @@ const Dashboard = () => {
 const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showAllActivities, setShowAllActivities] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+const [currentUser, setCurrentUser] = useState(null);
 const [dashboardData, setDashboardData] = useState({
     activities: [],
     activityStats: {},
     recentSubmissions: [],
     students: [],
     enrollments: [],
+    recentLogins: [],
+    studentDeliverables: {},
+    unreadComments: [],
     stats: {
       totalCourses: 0,
       totalStudents: 0,
       pendingReviews: 0,
-      completedDeliverables: 0
+      completedDeliverables: 0,
+      averageProgress: 0,
+      activeStudentsToday: 0
     }
 });
 
@@ -45,22 +51,57 @@ const loadDashboardData = async () => {
       setError("")
       setLoading(true)
 
-const [user, activities, activityStats, submissions, students, enrollments] = await Promise.all([
+const [user, activities, activityStats, submissions, students, enrollments, recentLogins, allComments] = await Promise.all([
         userService.getById(currentUserId),
         activityService.getRecentActivity(8),
         activityService.getActivityStats(),
         submissionService.getAll(),
         userService.getByRole("student"),
-        enrollmentService.getAll()
+        enrollmentService.getAll(),
+        userService.getRecentLogins(10),
+        Promise.all(
+          (await submissionService.getAll()).map(async (submission) => {
+            const comments = await commentService.getBySubmissionId(submission.Id);
+            return comments.map(comment => ({ ...comment, submissionId: submission.Id }));
+          })
+        ).then(results => results.flat())
 ])
 
       setCurrentUser(user);
+
+      // Calculate student deliverables count
+      const studentDeliverables = {};
+      students.forEach(student => {
+        const studentSubmissions = submissions.filter(s => s.studentId === student.Id);
+        studentDeliverables[student.Id] = {
+          total: studentSubmissions.length,
+          pending: studentSubmissions.filter(s => s.status === "pending").length,
+          approved: studentSubmissions.filter(s => s.status === "approved").length,
+          changes: studentSubmissions.filter(s => s.status === "changes_requested").length
+        };
+      });
+
+      // Calculate average progress
+      const validEnrollments = enrollments.filter(e => e.progress?.overallProgress != null);
+      const averageProgress = validEnrollments.length > 0 
+        ? Math.round(validEnrollments.reduce((sum, e) => sum + (e.progress.overallProgress || 0), 0) / validEnrollments.length)
+        : 0;
+
+      // Get unread comments (simplified - in real app would track read status)
+      const unreadComments = allComments
+        .filter(comment => comment.authorId !== currentUserId)
+        .slice(0, 5)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       const stats = {
         totalCourses: enrollments.length,
         totalStudents: students.length,
         pendingReviews: submissions.filter(s => s.status === "pending").length,
-        completedDeliverables: submissions.filter(s => s.status === "approved").length
+        completedDeliverables: submissions.filter(s => s.status === "approved").length,
+        averageProgress,
+        activeStudentsToday: recentLogins.filter(login => 
+          new Date(login.lastLoginAt) > new Date(Date.now() - 24 * 60 * 60 * 1000)
+        ).length
       }
 
       setDashboardData({
@@ -69,6 +110,9 @@ activities,
         recentSubmissions: submissions.slice(0, 5),
         students: students.slice(0, 8),
         enrollments,
+        recentLogins,
+        studentDeliverables,
+        unreadComments,
         stats
       })
 
@@ -135,7 +179,7 @@ return (
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Total Courses"
           value={dashboardData.stats.totalCourses}
@@ -163,6 +207,13 @@ return (
           icon="Award"
           gradient="bg-gradient-to-br from-success-500 to-success-600"
           change="+8 this week"
+        />
+        <StatCard
+          title="Avg Progress"
+          value={`${dashboardData.stats.averageProgress}%`}
+          icon="TrendingUp"
+          gradient="bg-gradient-to-br from-accent-500 to-accent-600"
+          change={`${dashboardData.stats.activeStudentsToday} active today`}
         />
       </div>
 
@@ -378,6 +429,248 @@ key={activity.Id}
       </div>
 
       {/* Students Overview */}
+{/* Student Progress Overview */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Student Progress Overview</CardTitle>
+              <CardDescription>Track individual student progress and completion</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/students')}
+            >
+              <ApperIcon name="Users" className="h-4 w-4 mr-2" />
+              View All
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {dashboardData.students.map((student, index) => {
+              const enrollment = dashboardData.enrollments.find(e => e.userId === student.Id)
+              const progress = enrollment?.progress?.overallProgress || 0
+              const currentLesson = enrollment?.progress?.currentLesson || "Not started"
+
+              return (
+                <motion.div
+                  key={student.Id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+                  onClick={() => navigate(`/students/${student.Id}`)}
+                >
+                  <UserAvatar user={student} size="md" />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 truncate">{student.name}</h4>
+                    <p className="text-sm text-gray-500 truncate">{currentLesson}</p>
+                    <div className="flex items-center mt-1">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2 mr-3">
+                        <div 
+                          className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-600">{progress}%</span>
+                    </div>
+                  </div>
+                  <ProgressRing progress={progress} size={40} strokeWidth={3} />
+                </motion.div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent Student Activity */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Recent Student Activity</CardTitle>
+              <CardDescription>Last student sign-ins and activity status</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/students')}
+            >
+              <ApperIcon name="Activity" className="h-4 w-4 mr-2" />
+              View Details
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {dashboardData.recentLogins.slice(0, 6).map((student, index) => {
+              const isActiveToday = student.lastLoginAt && new Date(student.lastLoginAt) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+              const lastSeen = student.lastLoginAt ? getTimeAgo(student.lastLoginAt) : "Never";
+              
+              return (
+                <motion.div
+                  key={student.Id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="relative">
+                      <UserAvatar user={student} size="sm" />
+                      <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${
+                        isActiveToday ? 'bg-green-500' : 'bg-gray-400'
+                      }`} />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{student.name}</p>
+                      <p className="text-sm text-gray-500">Last seen: {lastSeen}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <StatusBadge 
+                      status={isActiveToday ? 'active' : 'inactive'} 
+                      text={isActiveToday ? 'Active' : 'Inactive'} 
+                    />
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Student Deliverables Summary */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Student Deliverables</CardTitle>
+              <CardDescription>Track submissions and deliverables from each student</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/deliverables')}
+            >
+              <ApperIcon name="Package" className="h-4 w-4 mr-2" />
+              View All
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {dashboardData.students.map((student, index) => {
+              const deliverables = dashboardData.studentDeliverables[student.Id] || { total: 0, pending: 0, approved: 0, changes: 0 };
+              
+              return (
+                <motion.div
+                  key={student.Id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-primary-200 hover:bg-primary-50 transition-all duration-200"
+                >
+                  <div className="flex items-center space-x-3">
+                    <UserAvatar user={student} size="sm" />
+                    <div>
+                      <p className="font-medium text-gray-900">{student.name}</p>
+                      <p className="text-sm text-gray-500">{deliverables.total} total submissions</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-warning-600">{deliverables.pending}</div>
+                      <div className="text-xs text-gray-500">Pending</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-success-600">{deliverables.approved}</div>
+                      <div className="text-xs text-gray-500">Approved</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-error-600">{deliverables.changes}</div>
+                      <div className="text-xs text-gray-500">Changes</div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate(`/students/${student.Id}/submissions`)}
+                    >
+                      <ApperIcon name="ExternalLink" className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </motion.div>
+              )
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Unread Messages */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Unread Messages</CardTitle>
+              <CardDescription>Recent unread comments and conversations</CardDescription>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/chat')}
+            >
+              <ApperIcon name="MessageCircle" className="h-4 w-4 mr-2" />
+              View All
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {dashboardData.unreadComments.length === 0 ? (
+              <div className="text-center py-8">
+                <ApperIcon name="MessageSquare" className="h-12 w-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No unread messages</p>
+              </div>
+            ) : (
+              dashboardData.unreadComments.map((comment, index) => {
+                const author = dashboardData.students.find(s => s.Id === comment.authorId) || 
+                              { name: "Unknown User", Id: comment.authorId };
+                
+                return (
+                  <motion.div
+                    key={comment.Id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+                    onClick={() => {
+                      navigate(`/submissions/${comment.submissionId}`);
+                      toast.success("Navigated to conversation");
+                    }}
+                  >
+                    <UserAvatar user={author} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="font-medium text-gray-900">{author.name}</p>
+                        <span className="text-xs text-gray-500">{getTimeAgo(comment.createdAt)}</span>
+                      </div>
+                      <p className="text-sm text-gray-600 line-clamp-2">{comment.text}</p>
+                      <div className="flex items-center mt-2">
+                        <div className="w-2 h-2 bg-primary-500 rounded-full mr-2" />
+                        <span className="text-xs text-primary-600 font-medium">Unread</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Existing Active Students Card - Updated */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -395,7 +688,7 @@ key={activity.Id}
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {dashboardData.students.map((student, index) => {
               const enrollment = dashboardData.enrollments.find(e => e.userId === student.Id)
               const progress = enrollment?.progress?.overallProgress || 0
@@ -420,7 +713,6 @@ key={activity.Id}
           </div>
         </CardContent>
       </Card>
-
 {/* Quick Actions */}
       <Card>
         <CardHeader>
