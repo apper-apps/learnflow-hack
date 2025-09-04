@@ -113,10 +113,10 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
       to={item.href}
       onClick={mobile ? () => setSidebarOpen(false) : undefined}
       className={({ isActive }) =>
-        `flex items-center ${collapsed ? 'justify-center px-3' : 'px-4'} py-3 text-sm font-medium rounded-lg transition-all duration-200 group relative ${
+`flex items-center ${collapsed ? 'justify-center px-3' : 'px-4'} py-3 text-sm font-medium rounded-lg transition-all duration-200 group relative ${
           isActive
-            ? "bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 shadow-sm"
-            : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+            ? "bg-primary-50 text-primary-700 border border-primary-200"
+            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
         }`
       }
       title={collapsed ? item.name : undefined}
@@ -132,10 +132,10 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+<div className="min-h-screen bg-white">
       {/* Desktop Sidebar */}
 <motion.div 
-        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:overflow-y-auto lg:bg-white lg:border-r lg:border-gray-200 transition-all duration-300 ${
+        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:overflow-y-auto lg:bg-white lg:border-r lg:border-gray-100 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:w-16' : 'lg:w-72'
         }`}
         initial={false}
@@ -144,18 +144,18 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-4' : 'px-6'} py-8`}>
+<div className={`flex items-center ${sidebarCollapsed ? 'justify-center px-4' : 'px-6'} py-8`}>
             {sidebarCollapsed ? (
-              <div className="h-10 w-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
+              <div className="h-10 w-10 bg-primary-600 rounded-lg flex items-center justify-center">
                 <ApperIcon name="GraduationCap" className="h-6 w-6 text-white" />
               </div>
             ) : (
               <div className="flex items-center">
-                <div className="h-10 w-10 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
+                <div className="h-10 w-10 bg-primary-600 rounded-lg flex items-center justify-center">
                   <ApperIcon name="GraduationCap" className="h-6 w-6 text-white" />
                 </div>
                 <div className="ml-3">
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                  <h1 className="text-xl font-bold text-gray-900">
                     LearnFlow Pro
                   </h1>
                   <p className="text-xs text-gray-500">Course & Coaching Platform</p>
@@ -165,10 +165,10 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
           </div>
 
           {/* Toggle Button */}
-          <div className={`${sidebarCollapsed ? 'px-4' : 'px-6'} pb-4`}>
+<div className={`${sidebarCollapsed ? 'px-4' : 'px-6'} pb-4`}>
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <ApperIcon name={sidebarCollapsed ? "ChevronRight" : "ChevronLeft"} className="h-5 w-5" />
@@ -183,7 +183,7 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
           </nav>
 
           {/* User Profile */}
-          <div className={`${sidebarCollapsed ? 'px-2' : 'px-6'} py-6 border-t border-gray-200`}>
+<div className={`${sidebarCollapsed ? 'px-2' : 'px-6'} py-6 border-t border-gray-100`}>
             {sidebarCollapsed ? (
               <div className="flex justify-center">
                 <UserAvatar user={currentUser} size="md" />
@@ -215,25 +215,25 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 lg:hidden"
+className="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 lg:hidden"
             >
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+<div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
                   <div className="flex items-center">
-                    <div className="h-8 w-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
+                    <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
                       <ApperIcon name="GraduationCap" className="h-5 w-5 text-white" />
                     </div>
                     <div className="ml-3">
-                      <h1 className="text-lg font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+                      <h1 className="text-lg font-bold text-gray-900">
                         LearnFlow Pro
                       </h1>
                     </div>
                   </div>
                   
                   <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+onClick={() => setSidebarOpen(false)}
+                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
                   >
                     <ApperIcon name="X" className="h-5 w-5" />
                   </button>
@@ -247,7 +247,7 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
                 </nav>
 
                 {/* Mobile User Profile */}
-                <div className="px-6 py-4 border-t border-gray-200">
+<div className="px-6 py-4 border-t border-gray-100">
                   <UserAvatar user={currentUser} size="md" showName />
                 </div>
               </div>
@@ -259,19 +259,19 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
       {/* Main Content */}
 <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:pl-16' : 'lg:pl-72'}`}>
         {/* Mobile Header */}
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 bg-white lg:hidden">
-          <button
+<div className="flex items-center justify-between px-4 py-4 border-b border-gray-100 bg-white lg:hidden">
+<button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors"
           >
             <ApperIcon name="Menu" className="h-6 w-6" />
           </button>
           
-          <div className="flex items-center">
-            <div className="h-8 w-8 bg-gradient-to-br from-primary-600 to-secondary-600 rounded-lg flex items-center justify-center">
+<div className="flex items-center">
+            <div className="h-8 w-8 bg-primary-600 rounded-lg flex items-center justify-center">
               <ApperIcon name="GraduationCap" className="h-5 w-5 text-white" />
             </div>
-            <h1 className="ml-2 text-lg font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+            <h1 className="ml-2 text-lg font-bold text-gray-900">
               LearnFlow Pro
             </h1>
           </div>

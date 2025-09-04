@@ -5,8 +5,8 @@ const Card = forwardRef(({ className, children, onClick, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200",
-      "hover:shadow-md hover:border-gray-300",
+"rounded-lg border border-gray-100 bg-white transition-all duration-200",
+      "hover:border-gray-200",
       onClick && "cursor-pointer",
       className
     )}
@@ -27,9 +27,9 @@ const CardHeader = forwardRef(({ className, ...props }, ref) => (
 
 const CardTitle = forwardRef(({ className, ...props }, ref) => (
   <h3
-    ref={ref}
+ref={ref}
     className={cn(
-      "text-xl font-semibold leading-none tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent",
+      "text-xl font-semibold leading-none tracking-tight text-gray-900",
       className
     )}
     {...props}
@@ -39,7 +39,7 @@ const CardTitle = forwardRef(({ className, ...props }, ref) => (
 const CardDescription = forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-gray-600 leading-relaxed", className)}
+className={cn("text-sm text-gray-500 leading-relaxed", className)}
     {...props}
   />
 ))

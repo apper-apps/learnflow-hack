@@ -119,11 +119,11 @@ const navigate = useNavigate()
   if (error) return <Error message={error} onRetry={loadData} />
 
   return (
-    <div className="p-6 space-y-6">
+<div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+<h1 className="text-3xl font-bold text-gray-900">
             Students
           </h1>
           <p className="text-gray-600 mt-1">
@@ -132,8 +132,8 @@ const navigate = useNavigate()
         </div>
         
         <Button
-          onClick={() => setShowAddForm(true)}
-          className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800"
+onClick={() => setShowAddForm(true)}
+          variant="primary"
         >
           <ApperIcon name="UserPlus" className="h-4 w-4 mr-2" />
           Add Student
@@ -142,7 +142,7 @@ const navigate = useNavigate()
 
       {/* Add Student Form */}
       {showAddForm && (
-        <Card>
+<Card className="bg-white">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Add New Student</CardTitle>
@@ -207,19 +207,19 @@ const navigate = useNavigate()
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+<Card className="bg-white">
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary-600">{students.length}</div>
+            <div className="text-2xl font-bold text-gray-900">{students.length}</div>
             <div className="text-sm text-gray-600">Total Students</div>
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
+<CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-success-600">{enrollments.length}</div>
             <div className="text-sm text-gray-600">Active Enrollments</div>
           </CardContent>
         </Card>
-        <Card>
+<Card className="bg-white">
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-accent-600">
               {Math.round(enrollments.reduce((sum, e) => sum + (e.progress?.overallProgress || 0), 0) / Math.max(enrollments.length, 1))}%
@@ -228,8 +228,8 @@ const navigate = useNavigate()
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-warning-600">
+<CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-gray-900">
               {courses.filter(c => c.status === "published").length}
             </div>
             <div className="text-sm text-gray-600">Available Courses</div>
@@ -258,12 +258,12 @@ const navigate = useNavigate()
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card className="hover:shadow-lg transition-all duration-200">
+<Card className="hover:border-gray-200 transition-all duration-200 bg-white">
                 <CardContent className="p-6">
                   <div className="flex items-center space-x-4 mb-4">
                     <UserAvatar user={student} size="lg" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate">
+<div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">
                         {student.name}
                       </h3>
                       <p className="text-sm text-gray-500 truncate">
@@ -308,7 +308,7 @@ const navigate = useNavigate()
                       variant="outline" 
                       size="sm" 
                       className="flex-1"
-                      onClick={() => window.location.href = `/students/${student.Id}/progress`}
+onClick={() => navigate(`/students/${student.Id}/progress`)}
                     >
                       <ApperIcon name="BarChart3" className="h-4 w-4 mr-2" />
                       Progress

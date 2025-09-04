@@ -7,13 +7,13 @@ const Badge = ({
   className 
 }) => {
   const variants = {
-    default: "bg-gray-100 text-gray-800 border-gray-200",
-    primary: "bg-gradient-to-r from-primary-100 to-primary-200 text-primary-800 border-primary-300",
-    secondary: "bg-gradient-to-r from-secondary-100 to-secondary-200 text-secondary-800 border-secondary-300",
-    success: "bg-gradient-to-r from-success-100 to-success-200 text-success-800 border-success-300",
-    warning: "bg-gradient-to-r from-warning-100 to-warning-200 text-warning-800 border-warning-300",
-    error: "bg-gradient-to-r from-error-100 to-error-200 text-error-800 border-error-300",
-    info: "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 border-blue-300"
+default: "bg-gray-100 text-gray-700 border-gray-200",
+    primary: "bg-primary-50 text-primary-700 border-primary-200",
+    secondary: "bg-secondary-50 text-secondary-700 border-secondary-200",
+    success: "bg-success-50 text-success-700 border-success-200",
+    warning: "bg-warning-50 text-warning-700 border-warning-200",
+    error: "bg-error-50 text-error-700 border-error-200",
+    info: "bg-blue-50 text-blue-700 border-blue-200"
   }
   
   const sizes = {

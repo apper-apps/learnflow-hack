@@ -24,7 +24,7 @@ import Layout from "@/components/organisms/Layout";
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
+<div className="min-h-screen bg-white">
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
@@ -56,10 +56,10 @@ function App() {
         </Routes>
       </div>
       
-      <ToastContainer
+<ToastContainer
         position="top-right"
         autoClose={3000}
-        hideProgressBar={false}
+        hideProgressBar={true}
         newestOnTop={false}
         closeOnClick
         rtl={false}

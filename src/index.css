@@ -14,11 +14,11 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  body {
+body {
     margin: 0;
     line-height: 1.5;
     color: #374151;
-    background-color: #ffffff;
+    background-color: #f9fafb;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -38,32 +38,31 @@
 
 .Toastify__toast {
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   font-size: 0.875rem;
   min-height: 48px;
   padding: 12px 16px;
 }
 
 .Toastify__toast--success {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: #10B981;
 }
 
 .Toastify__toast--error {
-  background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+  background: #EF4444;
 }
 
 .Toastify__toast--info {
-  background: linear-gradient(135deg, #4F46E5 0%, #4338CA 100%);
+  background: #4F46E5;
 }
 
 .Toastify__toast--warning {
-  background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  background: #F59E0B;
 }
 
 .Toastify__progress-bar {
-  height: 3px;
+  height: 2px;
 }
-
 /* Progress Ring Animation */
 @keyframes progress-ring {
   0% {

@@ -25,13 +25,13 @@ const UserAvatar = ({
   const getRoleColor = (role) => {
     switch (role) {
       case "admin":
-        return "bg-gradient-to-br from-primary-500 to-primary-600 text-white"
+return "bg-primary-600 text-white"
       case "coach":
-        return "bg-gradient-to-br from-secondary-500 to-secondary-600 text-white"
+        return "bg-secondary-600 text-white"
       case "student":
-        return "bg-gradient-to-br from-accent-500 to-accent-600 text-white"
+        return "bg-accent-600 text-white"
       default:
-        return "bg-gradient-to-br from-gray-500 to-gray-600 text-white"
+        return "bg-gray-600 text-white"
     }
   }
 

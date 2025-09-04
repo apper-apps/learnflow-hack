@@ -130,12 +130,12 @@ activities,
   if (error) return <Error message={error} onRetry={loadDashboardData} />
 
   const StatCard = ({ title, value, icon, gradient, change }) => (
-    <Card className="overflow-hidden">
+<Card className="overflow-hidden bg-white">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-600">{title}</p>
-            <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <p className="text-3xl font-bold text-gray-900">
               {value}
             </p>
             {change && (
@@ -145,7 +145,7 @@ activities,
               </p>
             )}
           </div>
-          <div className={`h-14 w-14 rounded-full ${gradient} flex items-center justify-center`}>
+          <div className={`h-14 w-14 rounded-lg ${gradient.replace('bg-gradient-to-br', 'bg')} flex items-center justify-center`}>
             <ApperIcon name={icon} className="h-7 w-7 text-white" />
           </div>
         </div>
@@ -158,7 +158,7 @@ return (
       {/* Header */}
       <div className="space-y-4">
         <div className="space-y-2">
-<h1 className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+<h1 className="text-3xl font-bold text-gray-900">
             Welcome back, {currentUser?.name || 'User'}!
           </h1>
           <p className="text-gray-600">
@@ -182,35 +182,35 @@ return (
           title="Total Courses"
           value={dashboardData.stats.totalCourses}
           icon="BookOpen"
-          gradient="bg-gradient-to-br from-primary-500 to-primary-600"
+          gradient="bg-primary-600"
           change="+2 this month"
         />
         <StatCard
           title="Active Students"
           value={dashboardData.stats.totalStudents}
           icon="Users"
-          gradient="bg-gradient-to-br from-secondary-500 to-secondary-600"
+          gradient="bg-secondary-600"
           change="+12% this week"
         />
         <StatCard
           title="Pending Reviews"
           value={dashboardData.stats.pendingReviews}
           icon="MessageSquare"
-          gradient="bg-gradient-to-br from-warning-500 to-warning-600"
+          gradient="bg-warning-600"
           change="2 urgent"
         />
         <StatCard
           title="Deliverables"
           value={dashboardData.stats.completedDeliverables}
           icon="Award"
-          gradient="bg-gradient-to-br from-success-500 to-success-600"
+          gradient="bg-success-600"
           change="+8 this week"
         />
         <StatCard
           title="Avg Progress"
           value={`${dashboardData.stats.averageProgress}%`}
           icon="TrendingUp"
-          gradient="bg-gradient-to-br from-accent-500 to-accent-600"
+          gradient="bg-accent-600"
           change={`${dashboardData.stats.activeStudentsToday} active today`}
         />
       </div>
@@ -249,31 +249,31 @@ return (
             ) : (
               <div className="space-y-4">
                 {dashboardData.activities.map((activity, index) => {
-                  const getActivityColor = (type) => {
+const getActivityColor = (type) => {
                     switch (type) {
                       case "submission":
-                        return "from-blue-500 to-blue-600"
+                        return "bg-blue-600"
                       case "login":
-                        return "from-green-500 to-green-600"
+                        return "bg-green-600"
                       case "payment":
-                        return "from-purple-500 to-purple-600"
+                        return "bg-purple-600"
                       case "enrollment":
-                        return "from-orange-500 to-orange-600"
+                        return "bg-orange-600"
                       default:
-                        return "from-gray-500 to-gray-600"
+                        return "bg-gray-600"
                     }
                   }
 
 
                   return (
-                    <motion.div
-key={activity.Id}
+<motion.div
+                      key={activity.Id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                     >
-                      <div className={`h-10 w-10 bg-gradient-to-br ${getActivityColor(activity.type)} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                      <div className={`h-10 w-10 ${getActivityColor(activity.type)} rounded-lg flex items-center justify-center flex-shrink-0`}>
                         <ApperIcon name={activity.icon} className="h-5 w-5 text-white" />
                       </div>
                       
@@ -393,11 +393,11 @@ key={activity.Id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-primary-200 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                 onClick={() => navigate(`/submissions/${submission.Id}`)}
               >
                 <div className="flex items-center space-x-3">
-                  <div className="h-10 w-10 bg-gradient-to-br from-accent-500 to-accent-600 rounded-lg flex items-center justify-center">
+                  <div className="h-10 w-10 bg-accent-600 rounded-lg flex items-center justify-center">
                     <ApperIcon name="FileText" className="h-5 w-5 text-white" />
                   </div>
                   <div>
@@ -448,7 +448,7 @@ key={activity.Id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:bg-primary-50 transition-all duration-200 cursor-pointer"
+className="flex items-center space-x-4 p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200 cursor-pointer"
                   onClick={() => navigate(`/students/${student.Id}`)}
                 >
                   <UserAvatar user={student} size="md" />
@@ -457,8 +457,8 @@ key={activity.Id}
                     <p className="text-sm text-gray-500 truncate">{currentLesson}</p>
                     <div className="flex items-center mt-1">
                       <div className="flex-1 bg-gray-200 rounded-full h-2 mr-3">
-                        <div 
-                          className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-300"
+<div 
+                          className="bg-primary-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${progress}%` }}
                         />
                       </div>
@@ -497,7 +497,7 @@ key={activity.Id}
               const isActiveToday = student.lastLoginAt && new Date(student.lastLoginAt) > new Date(Date.now() - 24 * 60 * 60 * 1000);
               const lastSeen = student.lastLoginAt ? getTimeAgo(student.lastLoginAt) : "Never";
               
-              return (
+return (
                 <motion.div
                   key={student.Id}
                   initial={{ opacity: 0, x: -20 }}
@@ -556,10 +556,10 @@ key={activity.Id}
               return (
                 <motion.div
                   key={student.Id}
-                  initial={{ opacity: 0, scale: 0.95 }}
+initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-primary-200 hover:bg-primary-50 transition-all duration-200"
+                  className="flex items-center justify-between p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200"
                 >
                   <div className="flex items-center space-x-3">
                     <UserAvatar user={student} size="sm" />
@@ -632,7 +632,7 @@ key={activity.Id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
+className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       navigate(`/submissions/${comment.submissionId}`);
                       toast.success("Navigated to conversation");
@@ -645,9 +645,9 @@ key={activity.Id}
                         <span className="text-xs text-gray-500">{getTimeAgo(comment.createdAt)}</span>
                       </div>
                       <p className="text-sm text-gray-600 line-clamp-2">{comment.text}</p>
-                      <div className="flex items-center mt-2">
-                        <div className="w-2 h-2 bg-primary-500 rounded-full mr-2" />
-                        <span className="text-xs text-primary-600 font-medium">Unread</span>
+<div className="flex items-center mt-2">
+                        <div className="w-2 h-2 bg-primary-600 rounded-full mr-2" />
+                        <span className="text-xs text-primary-700 font-medium">Unread</span>
                       </div>
                     </div>
                   </motion.div>
@@ -681,13 +681,13 @@ key={activity.Id}
               const enrollment = dashboardData.enrollments.find(e => e.userId === student.Id)
               const progress = enrollment?.progress?.overallProgress || 0
 
-              return (
+return (
                 <motion.div
                   key={student.Id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex items-center space-x-3 p-4 border border-gray-100 rounded-lg hover:border-primary-200 hover:bg-primary-50 transition-all duration-200"
+                  className="flex items-center space-x-3 p-4 border border-gray-100 rounded-lg hover:border-gray-200 hover:bg-gray-50 transition-all duration-200"
                 >
                   <UserAvatar user={student} size="md" />
                   <div className="flex-1 min-w-0">
