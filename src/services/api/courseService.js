@@ -23,7 +23,7 @@ export const courseService = {
       throw new Error("Course not found")
     }
     return { ...course }
-  },
+},
 
   async create(courseData) {
     await delay()
@@ -85,11 +85,10 @@ async update(id, courseData) {
 
   async getCourseStructure(courseId) {
     await delay()
-    const course = courses.find(c => c.Id === parseInt(courseId))
+const course = courses.find(c => c.Id === parseInt(courseId))
     if (!course) {
       throw new Error("Course not found")
     }
-
 const courseModules = modules
       .filter(m => m.courseId === parseInt(courseId))
       .sort((a, b) => a.orderIndex - b.orderIndex)

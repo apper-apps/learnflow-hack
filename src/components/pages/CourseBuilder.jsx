@@ -26,6 +26,7 @@ const [courseData, setCourseData] = useState({
     title: "",
     description: "",
     status: "draft",
+    aiCoachId: null,
     pricing: {
       type: "free", // free, one_time, subscription, monthly_plan
       daysUntilExpiry: null,
@@ -96,6 +97,7 @@ setCourseData({
         title: courseStructure.title,
         description: courseStructure.description,
         status: courseStructure.status,
+        aiCoachId: courseStructure.aiCoachId || null,
         pricing: courseStructure.pricing || {
           type: "free",
           daysUntilExpiry: null,
@@ -1112,6 +1114,49 @@ useEffect(() => {
                 </div>
               </div>
 </div>
+          </CardContent>
+        </Card>
+{/* AI Coach Assignment Section */}
+        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-800">
+              <ApperIcon name="Brain" className="h-6 w-6 mr-3" />
+              AI Coach Assignment
+            </CardTitle>
+            <p className="text-sm text-blue-600">
+              Assign an AI coach to provide personalized assistance to students
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Select
+              label="AI Coach (Optional)"
+              value={courseData.aiCoachId || ""}
+              onChange={(e) => setCourseData(prev => ({
+                ...prev,
+                aiCoachId: e.target.value ? parseInt(e.target.value) : null
+              }))}
+            >
+              <option value="">No AI Coach</option>
+              {/* AI coaches would be loaded from aiCoachService */}
+              <option value="1">Marketing Mastery Coach</option>
+              <option value="2">Programming Mentor</option>
+              <option value="3">Business Strategy Advisor</option>
+            </Select>
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <ApperIcon name="Info" className="h-4 w-4 text-blue-600 mt-0.5" />
+                <div className="text-sm text-blue-700">
+                  <p className="font-medium">AI coaches provide personalized assistance by:</p>
+                  <ul className="mt-2 space-y-1 list-disc list-inside">
+                    <li>Answering course-specific questions</li>
+                    <li>Providing guidance based on lesson content</li>
+                    <li>Offering personalized learning recommendations</li>
+                    <li>Never giving generic responses</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

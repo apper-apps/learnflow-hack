@@ -7,6 +7,7 @@ import { courseService } from '@/services/api/courseService'
 import { bundleService } from '@/services/api/bundleService'
 import { userService } from '@/services/api/userService'
 import { enrollmentService } from '@/services/api/enrollmentService'
+import { aiCoachService } from '@/services/api/aiCoachService'
 import ApperIcon from '@/components/ApperIcon'
 import UserAvatar from '@/components/molecules/UserAvatar'
 import SearchBar from '@/components/molecules/SearchBar'
@@ -22,7 +23,8 @@ function CourseList() {
   const [courses, setCourses] = useState([])
   const [bundles, setBundles] = useState([])
   const [users, setUsers] = useState([])
-  const [enrollments, setEnrollments] = useState([])
+const [enrollments, setEnrollments] = useState([])
+  const [aiCoaches, setAiCoaches] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -37,18 +39,20 @@ function CourseList() {
 
   async function loadCourses() {
     try {
-      setLoading(true)
-      const [coursesData, bundlesData, usersData, enrollmentsData] = await Promise.all([
+setLoading(true)
+      const [coursesData, bundlesData, usersData, enrollmentsData, aiCoachesData] = await Promise.all([
         courseService.getAll(),
         bundleService.getAll(),
         userService.getAll(),
-        enrollmentService.getAll()
+        enrollmentService.getAll(),
+        aiCoachService.getAll()
       ])
       
       setCourses(coursesData)
       setBundles(bundlesData)
       setUsers(usersData)
       setEnrollments(enrollmentsData)
+      setAiCoaches(aiCoachesData)
     } catch (error) {
       console.error('Error loading courses:', error)
       setError(error.message)
@@ -110,9 +114,8 @@ function CourseList() {
     }
   }
 
-  function filterCourses(query, status) {
+function filterCourses(query, status) {
     let filtered = [...courses]
-
     if (status !== 'all') {
       filtered = filtered.filter(course => course.status === status)
     }
@@ -151,9 +154,14 @@ function CourseList() {
     return enrollments.filter(enrollment => enrollment.courseId === courseId).length
   }
 
-  function getCoachName(ownerId) {
+function getCoachName(ownerId) {
     const user = users.find(u => u.Id === ownerId)
     return user ? user.name : 'Unknown'
+  }
+
+  function getAiCoachName(aiCoachId) {
+    const aiCoach = aiCoaches.find(c => c.Id === aiCoachId)
+    return aiCoach ? aiCoach.name : null
   }
 
   const filteredCourses = filterCourses(searchQuery, statusFilter)
@@ -267,9 +275,15 @@ function CourseList() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <StatusBadge status={course.status} type="course" />
-                      <div className="text-sm text-gray-500">
+<div className="text-sm text-gray-500">
                         {getEnrollmentCount(course.Id)} students
                       </div>
+                      {course.aiCoachId && (
+                        <div className="flex items-center text-xs text-blue-600 mt-1">
+                          <ApperIcon name="Brain" className="h-3 w-3 mr-1" />
+                          {getAiCoachName(course.aiCoachId)}
+                        </div>
+                      )}
                     </div>
                     <CardTitle className="group-hover:text-primary-600 transition-colors">
                       {course.title}
@@ -282,7 +296,7 @@ function CourseList() {
                   <CardContent>
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <div className="flex items-center space-x-2">
-                        <ApperIcon name="User" className="h-4 w-4" />
+<ApperIcon name="User" className="h-4 w-4" />
                         <span>{getCoachName(course.ownerId)}</span>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -357,7 +371,13 @@ function CourseList() {
                 <Card className="h-full hover:shadow-lg transition-all duration-200 cursor-pointer group">
                   <CardHeader>
                     <div className="flex items-start justify-between">
-                      <StatusBadge status={bundle.status} type="bundle" />
+<StatusBadge status={bundle.status} type="bundle" />
+                      {bundle.aiCoachId && (
+                        <div className="flex items-center text-xs text-blue-600 mt-2">
+                          <ApperIcon name="Brain" className="h-3 w-3 mr-1" />
+                          {getAiCoachName(bundle.aiCoachId)}
+                        </div>
+                      )}
                       <div className="text-sm text-gray-500">
                         {bundle.courses.length} courses
                       </div>

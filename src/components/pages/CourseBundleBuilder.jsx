@@ -19,11 +19,12 @@ function CourseBundleBuilder() {
   const navigate = useNavigate()
   const isEditing = Boolean(bundleId)
   
-  const [bundleData, setBundleData] = useState({
+const [bundleData, setBundleData] = useState({
     title: '',
     description: '',
     courses: [],
     status: 'draft',
+    aiCoachId: null,
     pricing: {
       type: 'free',
       currency: 'USD',
@@ -65,8 +66,11 @@ function CourseBundleBuilder() {
 
       setAvailableCourses(coursesData.filter(course => course.status === 'published'))
       
-      if (bundleDataResult) {
-        setBundleData(bundleDataResult)
+if (bundleDataResult) {
+        setBundleData({
+          ...bundleDataResult,
+          aiCoachId: bundleDataResult.aiCoachId || null
+        })
       }
     } catch (error) {
       console.error('Error loading data:', error)
@@ -91,7 +95,7 @@ function CourseBundleBuilder() {
         return
       }
 
-      const dataToSave = {
+const dataToSave = {
         ...bundleData,
         status: isDraft ? 'draft' : 'published'
       }
@@ -753,6 +757,44 @@ function CourseBundleBuilder() {
                   )}
                 </div>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+{/* AI Coach Assignment */}
+      <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center text-blue-800">
+            <ApperIcon name="Brain" className="h-6 w-6 mr-3" />
+            AI Coach Assignment
+          </CardTitle>
+          <p className="text-sm text-blue-600">
+            Assign an AI coach to provide assistance across all courses in this bundle
+          </p>
+        </CardHeader>
+        <CardContent>
+          <Select
+            label="AI Coach (Optional)"
+            value={bundleData.aiCoachId || ""}
+            onChange={(e) => setBundleData(prev => ({
+              ...prev,
+              aiCoachId: e.target.value ? parseInt(e.target.value) : null
+            }))}
+          >
+            <option value="">No AI Coach</option>
+            <option value="1">Marketing Mastery Coach</option>
+            <option value="2">Programming Mentor</option>
+            <option value="3">Business Strategy Advisor</option>
+          </Select>
+          
+          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-start space-x-2">
+              <ApperIcon name="Lightbulb" className="h-4 w-4 text-blue-600 mt-0.5" />
+              <p className="text-sm text-blue-700">
+                The assigned AI coach will provide assistance for all courses within this bundle, 
+                understanding the interconnected learning journey across multiple courses.
+              </p>
             </div>
           </div>
         </CardContent>

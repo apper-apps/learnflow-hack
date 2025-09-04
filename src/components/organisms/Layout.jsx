@@ -18,7 +18,7 @@ const Layout = () => {
     avatar: null
   }
 
-  const navigationItems = [
+const navigationItems = [
     { 
       name: "Dashboard", 
       href: "/", 
@@ -54,6 +54,12 @@ const Layout = () => {
       href: "/tasks", 
       icon: "CheckSquare",
       roles: ["coach"]
+    },
+    { 
+      name: "AI Coaches", 
+      href: "/ai-coaches", 
+      icon: "Brain",
+      roles: ["admin", "coach"]
     },
     { 
       name: "Messages", 

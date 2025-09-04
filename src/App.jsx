@@ -20,13 +20,14 @@ import BusinessDetails from "@/components/pages/BusinessDetails";
 import PlansAndBilling from "@/components/pages/PlansAndBilling";
 import NotificationSettings from "@/components/pages/NotificationSettings";
 import CustomDomain from "@/components/pages/CustomDomain";
+import AICoachManager from "@/components/pages/AICoachManager";
 import Layout from "@/components/organisms/Layout";
 function App() {
   return (
     <BrowserRouter>
 <div className="min-h-screen bg-white">
         <Routes>
-          <Route path="/" element={<Layout />}>
+<Route path="/" element={<Layout />}>
             <Route index element={<Dashboard />} />
 <Route path="courses" element={<CourseList />} />
             <Route path="courses/new" element={<CourseBuilder />} />
@@ -46,6 +47,7 @@ function App() {
             <Route path="deliverables" element={<DeliverablesBoard />} />
 <Route path="deliverables/kanban" element={<DeliverablesBoard />} />
 <Route path="tasks" element={<TaskList />} />
+            <Route path="ai-coaches" element={<AICoachManager />} />
             <Route path="integrations" element={<Integrations />} />
 <Route path="account" element={<Account />} />
 <Route path="settings/business-details" element={<BusinessDetails />} />
