@@ -16,7 +16,7 @@ const Button = forwardRef(({
 const variants = {
 primary: "bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500 focus:ring-2 focus:ring-offset-2",
     secondary: "bg-secondary-600 hover:bg-secondary-700 text-white focus:ring-secondary-500 focus:ring-2 focus:ring-offset-2",
-outline: "border border-gray-300 dark:border-gray-600 hover:border-primary-500 text-gray-700 dark:text-gray-300 hover:text-primary-600 bg-white dark:bg-gray-800 hover:bg-primary-50 dark:hover:bg-primary-900 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2",
+    outline: "border border-gray-300 hover:border-primary-500 text-gray-700 hover:text-primary-600 bg-white hover:bg-primary-50 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2",
     ghost: "text-gray-700 hover:text-primary-600 hover:bg-primary-50 focus:ring-primary-500 focus:ring-2 focus:ring-offset-2",
     tab: "text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300 bg-transparent focus:ring-primary-500",
     link: "text-primary-600 hover:text-primary-700 underline-offset-4 hover:underline focus:ring-primary-500",

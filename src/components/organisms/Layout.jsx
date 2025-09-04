@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import ApperIcon from "@/components/ApperIcon";
 import UserAvatar from "@/components/molecules/UserAvatar";
-import Button from "@/components/atoms/Button";
+
 const Layout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
@@ -138,10 +138,10 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
   )
 
   return (
-<div className="min-h-screen bg-white transition-colors">
+<div className="min-h-screen bg-white">
       {/* Desktop Sidebar */}
 <motion.div 
-        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:overflow-y-auto lg:bg-white dark:bg-gray-800 lg:border-r lg:border-gray-100 dark:border-gray-700 transition-all duration-300 ${
+        className={`hidden lg:fixed lg:inset-y-0 lg:left-0 lg:z-50 lg:block lg:overflow-y-auto lg:bg-white lg:border-r lg:border-gray-100 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:w-16' : 'lg:w-72'
         }`}
         initial={false}
@@ -170,16 +170,15 @@ const NavItem = ({ item, mobile = false, collapsed = false }) => (
             )}
           </div>
 
-{/* Toggle Button */}
-<div className={`${sidebarCollapsed ? 'px-4' : 'px-6'} pb-4 space-y-2`}>
+          {/* Toggle Button */}
+<div className={`${sidebarCollapsed ? 'px-4' : 'px-6'} pb-4`}>
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="w-full flex items-center justify-center p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
               title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <ApperIcon name={sidebarCollapsed ? "ChevronRight" : "ChevronLeft"} className="h-5 w-5" />
             </button>
-            
           </div>
 
           {/* Navigation */}
