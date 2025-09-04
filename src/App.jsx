@@ -40,8 +40,9 @@ function App() {
             <Route path="search" element={<SemanticSearch />} />
             <Route path="students" element={<StudentList />} />
 <Route path="students/:studentId/progress" element={<StudentProgress />} />
-            <Route path="chat/:studentId" element={<Chat />} />
+<Route path="chat/:studentId" element={<Chat />} />
             <Route path="chat" element={<Chat />} />
+            <Route path="ai-coach-chat/:studentId/:responseId" element={<Chat />} />
             <Route path="reviews" element={<ReviewInbox />} />
             <Route path="submissions/:submissionId" element={<SubmissionDetail />} />
             <Route path="deliverables" element={<DeliverablesBoard />} />

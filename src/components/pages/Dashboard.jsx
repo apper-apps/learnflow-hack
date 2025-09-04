@@ -871,9 +871,9 @@ className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-poi
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                          navigate(`/chat/${response.studentId}`);
-                          toast.success("Opened conversation with student");
+onClick={() => {
+                          navigate(`/ai-coach-chat/${response.studentId}/${response.Id}`);
+                          toast.success("Opened AI coach conversation");
                         }}
                         className="text-xs"
                       >
@@ -895,10 +895,12 @@ className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-poi
                     </div>
                     
                     {!response.isUserOverride && (
-                      <Button
+<Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          // Navigate to AI coach chat with takeover context
+                          navigate(`/ai-coach-chat/${response.studentId}/${response.Id}?takeover=true`);
                           // Simulate user intervention
                           const updatedResponses = dashboardData.aiCoachResponses.map(r => 
                             r.Id === response.Id 
@@ -909,7 +911,7 @@ className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg cursor-poi
                             ...prev,
                             aiCoachResponses: updatedResponses
                           }));
-                          toast.success("You've taken over this conversation");
+                          toast.success("Taking over conversation - opening AI coach chat");
                         }}
                         className="text-xs"
                       >

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, useSearchParams } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
 import { toast } from "react-toastify"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card"
@@ -15,8 +15,9 @@ import Empty from "@/components/ui/Empty"
 import { userService } from "@/services/api/userService"
 
 function Chat() {
-  const { studentId } = useParams()
+const { studentId, responseId } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const messagesEndRef = useRef(null)
   const fileInputRef = useRef(null)
   
@@ -30,11 +31,24 @@ function Chat() {
   const [searchQuery, setSearchQuery] = useState("")
   const [sending, setSending] = useState(false)
   const [attachments, setAttachments] = useState([])
-
+  
+  // AI Coach specific state
+  const [aiCoachResponse, setAiCoachResponse] = useState(null)
+  const [aiCoachData, setAiCoachData] = useState(null)
+  const [isAiCoachMode, setIsAiCoachMode] = useState(false)
+  const [isTakeoverMode, setIsTakeoverMode] = useState(false)
   // Load initial data
   useEffect(() => {
     loadData()
   }, [])
+
+// Detect AI Coach mode and takeover mode
+  useEffect(() => {
+    const isAiMode = !!responseId
+    const isTakeover = searchParams.get('takeover') === 'true'
+    setIsAiCoachMode(isAiMode)
+    setIsTakeoverMode(isTakeover)
+  }, [responseId, searchParams])
 
   // Load specific student chat
   useEffect(() => {
@@ -47,6 +61,72 @@ function Chat() {
     }
   }, [studentId, students])
 
+  // Load AI Coach response data when in AI coach mode
+  useEffect(() => {
+    const loadAiCoachData = async () => {
+      if (responseId && isAiCoachMode) {
+        try {
+          // Mock AI coach response data - in real app would fetch from API
+          const mockAiResponse = {
+            Id: parseInt(responseId),
+            studentId: parseInt(studentId),
+            aiCoachId: 1,
+            studentQuestion: "I'm having trouble understanding React hooks. Can you explain useState and useEffect?",
+            aiResponse: "Great question! React hooks are functions that let you use state and other React features in functional components. Let me break down useState and useEffect for you:\n\n**useState:**\n- Manages component state\n- Returns current state value and setter function\n- Example: const [count, setCount] = useState(0)\n\n**useEffect:**\n- Handles side effects (API calls, subscriptions, etc.)\n- Runs after render\n- Can specify dependencies to control when it runs\n- Example: useEffect(() => { /* side effect */ }, [dependency])\n\nWould you like me to show you some practical examples?",
+            timestamp: new Date(Date.now() - 10 * 60 * 1000), // 10 minutes ago
+            status: 'pending_review',
+            conversationHistory: [
+              {
+                Id: 1,
+                senderId: parseInt(studentId),
+                senderName: students.find(s => s.Id === parseInt(studentId))?.name || "Student",
+                senderRole: "student",
+                content: "I'm having trouble understanding React hooks. Can you explain useState and useEffect?",
+                timestamp: new Date(Date.now() - 15 * 60 * 1000),
+                type: "text"
+              },
+              {
+                Id: 2,
+                senderId: 'ai-coach-1',
+                senderName: "React Learning Assistant",
+                senderRole: "ai_coach",
+                content: "Great question! React hooks are functions that let you use state and other React features in functional components. Let me break down useState and useEffect for you:\n\n**useState:**\n- Manages component state\n- Returns current state value and setter function\n- Example: const [count, setCount] = useState(0)\n\n**useEffect:**\n- Handles side effects (API calls, subscriptions, etc.)\n- Runs after render\n- Can specify dependencies to control when it runs\n- Example: useEffect(() => { /* side effect */ }, [dependency])\n\nWould you like me to show you some practical examples?",
+                timestamp: new Date(Date.now() - 10 * 60 * 1000),
+                type: "text"
+              }
+            ]
+          }
+          
+          setAiCoachResponse(mockAiResponse)
+          
+          // Load AI Coach data
+          const mockAiCoach = {
+            Id: 1,
+            name: "React Learning Assistant",
+            description: "Specialized AI coach for React development and best practices"
+          }
+          
+          setAiCoachData(mockAiCoach)
+          
+          // Set the AI conversation in the conversations state
+          if (mockAiResponse.conversationHistory) {
+            setConversations(prev => ({
+              ...prev,
+              [parseInt(studentId)]: mockAiResponse.conversationHistory
+            }))
+          }
+          
+        } catch (err) {
+          console.error("Failed to load AI coach data:", err)
+          toast.error("Failed to load AI coach conversation")
+        }
+      }
+    }
+    
+    if (students.length > 0) {
+      loadAiCoachData()
+    }
+  }, [responseId, isAiCoachMode, studentId, students])
   // Auto-scroll to bottom of messages
   useEffect(() => {
     scrollToBottom()
@@ -81,7 +161,12 @@ function Chat() {
     }
   }
 
-  const loadConversation = (studentId) => {
+const loadConversation = (studentId) => {
+    // In AI coach mode, conversation is loaded from AI response data
+    if (isAiCoachMode && aiCoachResponse?.conversationHistory) {
+      return // Already loaded in AI coach effect
+    }
+    
     // In a real app, this would fetch messages from API
     // For now, we use the generated sample messages
     const messages = conversations[studentId] || []
@@ -91,7 +176,12 @@ function Chat() {
     }))
   }
 
-  const generateSampleMessages = (student) => {
+const generateSampleMessages = (student) => {
+    // Don't generate sample messages in AI coach mode
+    if (isAiCoachMode) {
+      return []
+    }
+    
     const baseMessages = [
       {
         Id: 1,
@@ -124,7 +214,7 @@ function Chat() {
     return baseMessages
   }
 
-  const handleSendMessage = async () => {
+const handleSendMessage = async () => {
     if (!newMessage.trim() && attachments.length === 0) return
     if (!selectedStudent) return
 
@@ -157,25 +247,32 @@ function Chat() {
       setNewMessage("")
       setAttachments([])
       
-      // Simulate response after a delay
-      setTimeout(() => {
-        const responseData = {
-          Id: Date.now() + 1,
-          senderId: selectedStudent.Id,
-          senderName: selectedStudent.name,
-          senderRole: selectedStudent.role,
-          content: getAutomaticResponse(newMessage),
-          timestamp: new Date(),
-          type: "text"
-        }
+      // Different behavior for AI coach mode
+      if (isAiCoachMode && isTakeoverMode) {
+        // In takeover mode, instructor message continues the conversation
+        toast.success("Message sent - you've taken over this conversation!")
+        // Don't simulate student response in takeover mode
+      } else {
+        // Normal chat mode - simulate response after a delay
+        setTimeout(() => {
+          const responseData = {
+            Id: Date.now() + 1,
+            senderId: selectedStudent.Id,
+            senderName: selectedStudent.name,
+            senderRole: selectedStudent.role,
+            content: getAutomaticResponse(newMessage),
+            timestamp: new Date(),
+            type: "text"
+          }
 
-        setConversations(prev => ({
-          ...prev,
-          [selectedStudent.Id]: [...(prev[selectedStudent.Id] || []), responseData]
-        }))
-      }, 1500)
-
-      toast.success("Message sent successfully!")
+          setConversations(prev => ({
+            ...prev,
+            [selectedStudent.Id]: [...(prev[selectedStudent.Id] || []), responseData]
+          }))
+        }, 1500)
+        
+        toast.success("Message sent successfully!")
+      }
 
     } catch (err) {
       console.error("Failed to send message:", err)
@@ -378,6 +475,49 @@ function Chat() {
               {/* Messages Area */}
               <CardContent className="flex-1 overflow-hidden p-0">
                 <div className="h-full flex flex-col">
+{/* AI Coach Context Header */}
+                  {isAiCoachMode && aiCoachData && (
+                    <div className="bg-gradient-to-r from-primary-50 to-secondary-50 border-b border-primary-100 p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="h-10 w-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                            <ApperIcon name="Brain" className="h-5 w-5 text-primary-600" />
+                          </div>
+                          <div>
+                            <h3 className="text-sm font-semibold text-primary-900">
+                              AI Coach Conversation
+                            </h3>
+                            <p className="text-xs text-primary-700">
+                              {aiCoachData.name} • {isTakeoverMode ? "Taking over conversation" : "Reviewing AI responses"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          {isTakeoverMode && (
+                            <div className="px-2 py-1 bg-warning-100 text-warning-700 text-xs font-medium rounded-full">
+                              Instructor Takeover
+                            </div>
+                          )}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(-1)}
+                            className="text-xs"
+                          >
+                            <ApperIcon name="ArrowLeft" className="h-3 w-3 mr-1" />
+                            Back to Dashboard
+                          </Button>
+                        </div>
+                      </div>
+                      {aiCoachResponse && (
+                        <div className="mt-3 p-3 bg-white/60 rounded-lg border border-primary-200">
+                          <div className="text-xs text-primary-600 font-medium mb-1">Original Student Question:</div>
+                          <div className="text-sm text-gray-700">{aiCoachResponse.studentQuestion}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
                   <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-4">
                     {conversations[selectedStudent.Id]?.map((message) => (
                       <motion.div
