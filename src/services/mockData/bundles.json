@@ -30,7 +30,7 @@
     },
     "createdAt": "2024-01-15T10:30:00.000Z",
     "updatedAt": "2024-01-20T14:45:00.000Z"
-  },
+},
   {
     "Id": 2,
     "title": "Digital Marketing Mastery",
@@ -58,7 +58,7 @@
     },
     "createdAt": "2024-02-01T09:15:00.000Z",
     "updatedAt": "2024-02-05T16:20:00.000Z"
-  },
+},
   {
     "Id": 3,
     "title": "Design Fundamentals Collection",
