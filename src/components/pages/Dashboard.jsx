@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/atoms/Card";
 import { activityService } from "@/services/api/activityService";
 import { commentService, submissionService } from "@/services/api/submissionService";
 import { userService } from "@/services/api/userService";
 import { aiCoachService } from "@/services/api/aiCoachService";
 import { enrollmentService } from "@/services/api/enrollmentService";
-import { getTimeAgo } from "@/utils/timeUtils";
 import ApperIcon from "@/components/ApperIcon";
-import ProgressRing from "@/components/molecules/ProgressRing";
-import UserAvatar from "@/components/molecules/UserAvatar";
-import SearchBar from "@/components/molecules/SearchBar";
-import StatusBadge from "@/components/molecules/StatusBadge";
-import Error from "@/components/ui/Error";
-import Loading from "@/components/ui/Loading";
-import Chat from "@/components/pages/Chat";
 import Button from "@/components/atoms/Button";
-
+import Chat from "@/components/pages/Chat";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import UserAvatar from "@/components/molecules/UserAvatar";
+import StatusBadge from "@/components/molecules/StatusBadge";
+import ProgressRing from "@/components/molecules/ProgressRing";
+import SearchBar from "@/components/molecules/SearchBar";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { getTimeAgo } from "@/utils/timeUtils";
 const Dashboard = () => {
-const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-const [showAllActivities, setShowAllActivities] = useState(false);
+  const [showAllActivities, setShowAllActivities] = useState(false);
   const [showAllAIResponses, setShowAllAIResponses] = useState(false);
   const [showAllSubmissions, setShowAllSubmissions] = useState(false);
-const [currentUser, setCurrentUser] = useState(null);
-const [dashboardData, setDashboardData] = useState({
+  const [currentUser, setCurrentUser] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
     activities: [],
     activityStats: {},
     recentSubmissions: [],
@@ -44,11 +45,8 @@ const [dashboardData, setDashboardData] = useState({
       averageProgress: 0,
       activeStudentsToday: 0
     }
-});
-  const navigate = useNavigate();
-  // Mock current user ID - in real app this would come from auth context
-  const currentUserId = 1;
-
+  });
+  const currentUserId = useSelector((state) => state.user?.user?.Id || 1);
 const loadDashboardData = async () => {
     try {
       setError("")

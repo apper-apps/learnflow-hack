@@ -14,8 +14,7 @@ import Error from "@/components/ui/Error"
 import Empty from "@/components/ui/Empty"
 import { submissionService } from "@/services/api/submissionService"
 import { userService } from "@/services/api/userService"
-import { lessonService } from "@/services/api/courseService"
-
+import { courseService, lessonService } from "@/services/api/courseService"
 const ReviewInbox = () => {
   const [submissions, setSubmissions] = useState([])
   const [filteredSubmissions, setFilteredSubmissions] = useState([])
