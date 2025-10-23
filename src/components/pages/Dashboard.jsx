@@ -17,7 +17,7 @@ import UserAvatar from "@/components/molecules/UserAvatar";
 import StatusBadge from "@/components/molecules/StatusBadge";
 import ProgressRing from "@/components/molecules/ProgressRing";
 import SearchBar from "@/components/molecules/SearchBar";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/atoms/Card";
 import { getTimeAgo } from "@/utils/timeUtils";
 const Dashboard = () => {
   const navigate = useNavigate();
