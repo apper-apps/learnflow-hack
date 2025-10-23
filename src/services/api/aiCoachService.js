@@ -1,4 +1,5 @@
-import { delay } from '@/utils/timeUtils';
+// Helper function for simulating API delay
+const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
 
 const { ApperClient } = window.ApperSDK;
 
