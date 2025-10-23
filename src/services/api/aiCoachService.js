@@ -7,8 +7,6 @@ const apperClient = new ApperClient({
   apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
 })
 
-// Utility function to simulate API delay
-const delay = () => new Promise(resolve => setTimeout(resolve, 300))
 
 export const aiCoachService = {
   // Get all AI coaches

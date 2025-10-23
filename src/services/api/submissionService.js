@@ -15,7 +15,6 @@ const apperClient = new ApperClient({
   apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
 })
 
-const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
 
 export const submissionService = {
   async getAll() {
