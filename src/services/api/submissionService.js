@@ -1,114 +1,357 @@
-import submissionsData from "@/services/mockData/submissions.json"
 import commentsData from "@/services/mockData/comments.json"
 import tasksData from "@/services/mockData/tasks.json"
 import searchQueriesData from "@/services/mockData/searchQueries.json"
 
-let submissions = [...submissionsData]
 let comments = [...commentsData]
 let tasks = [...tasksData]
 let searchQueries = [...searchQueriesData]
 
 const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
 
+// Initialize ApperClient
+const { ApperClient } = window.ApperSDK
+const apperClient = new ApperClient({
+  apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+  apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+})
+
+const delay = () => new Promise(resolve => setTimeout(resolve, Math.random() * 400 + 200))
+
 export const submissionService = {
-async getAll() {
+  async getAll() {
     await delay()
-    return [...submissions]
+    try {
+      const response = await apperClient.fetchRecords('submission_c', {
+        fields: [
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "content_c"}},
+          {"field": {"Name": "files_c"}},
+          {"field": {"Name": "status_c"}},
+          {"field": {"Name": "submitted_at_c"}},
+          {"field": {"Name": "lesson_id_c"}},
+          {"field": {"Name": "student_id_c"}}
+        ]
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching submissions:", response.message)
+        return []
+      }
+      
+      // Parse files JSON string back to array
+      const submissions = (response.data || []).map(submission => ({
+        ...submission,
+        files: submission.files_c ? JSON.parse(submission.files_c) : []
+      }))
+      
+      return submissions
+    } catch (error) {
+      console.error("Error fetching submissions:", error?.message || error)
+      return []
+    }
   },
 
   async getRecent(limit = 5) {
     await delay()
-    return [...submissions]
-      .sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt))
-      .slice(0, limit)
+    try {
+      const response = await apperClient.fetchRecords('submission_c', {
+        fields: [
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "content_c"}},
+          {"field": {"Name": "files_c"}},
+          {"field": {"Name": "status_c"}},
+          {"field": {"Name": "submitted_at_c"}},
+          {"field": {"Name": "lesson_id_c"}},
+          {"field": {"Name": "student_id_c"}}
+        ],
+        orderBy: [{"fieldName": "submitted_at_c", "sorttype": "DESC"}],
+        pagingInfo: {"limit": limit, "offset": 0}
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching recent submissions:", response.message)
+        return []
+      }
+      
+      // Parse files JSON string back to array
+      const submissions = (response.data || []).map(submission => ({
+        ...submission,
+        files: submission.files_c ? JSON.parse(submission.files_c) : []
+      }))
+      
+      return submissions
+    } catch (error) {
+      console.error("Error fetching recent submissions:", error?.message || error)
+      return []
+    }
   },
 
   async getById(id) {
     await delay()
-    const submission = submissions.find(s => s.Id === parseInt(id))
-    if (!submission) {
+    try {
+      const response = await apperClient.getRecordById('submission_c', parseInt(id), {
+        fields: [
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "content_c"}},
+          {"field": {"Name": "files_c"}},
+          {"field": {"Name": "status_c"}},
+          {"field": {"Name": "submitted_at_c"}},
+          {"field": {"Name": "lesson_id_c"}},
+          {"field": {"Name": "student_id_c"}}
+        ]
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching submission:", response.message)
+        throw new Error("Submission not found")
+      }
+      
+      // Parse files JSON string back to array
+      const submission = {
+        ...response.data,
+        files: response.data.files_c ? JSON.parse(response.data.files_c) : []
+      }
+      
+      return submission
+    } catch (error) {
+      console.error("Error fetching submission:", error?.message || error)
       throw new Error("Submission not found")
     }
-    return { ...submission }
   },
 
-async getByStudentId(studentId) {
+  async getByStudentId(studentId) {
     await delay()
-    return submissions
-      .filter(s => s.studentId === parseInt(studentId))
-      .map(s => ({ ...s }))
+    try {
+      const response = await apperClient.fetchRecords('submission_c', {
+        fields: [
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "content_c"}},
+          {"field": {"Name": "files_c"}},
+          {"field": {"Name": "status_c"}},
+          {"field": {"Name": "submitted_at_c"}},
+          {"field": {"Name": "lesson_id_c"}},
+          {"field": {"Name": "student_id_c"}}
+        ],
+        where: [
+          {"FieldName": "student_id_c", "Operator": "EqualTo", "Values": [parseInt(studentId)]}
+        ]
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching submissions by student:", response.message)
+        return []
+      }
+      
+      // Parse files JSON string back to array
+      const submissions = (response.data || []).map(submission => ({
+        ...submission,
+        files: submission.files_c ? JSON.parse(submission.files_c) : []
+      }))
+      
+      return submissions
+    } catch (error) {
+      console.error("Error fetching submissions by student:", error?.message || error)
+      return []
+    }
   },
 
   async getSubmissionsByStudent() {
     await delay()
-    const studentSubmissions = {};
-    submissions.forEach(submission => {
-      if (!studentSubmissions[submission.studentId]) {
-        studentSubmissions[submission.studentId] = [];
-      }
-      studentSubmissions[submission.studentId].push({ ...submission });
-    });
-    return studentSubmissions;
+    try {
+      const allSubmissions = await this.getAll()
+      const studentSubmissions = {}
+      
+      allSubmissions.forEach(submission => {
+        const studentId = submission.student_id_c?.Id || submission.student_id_c
+        if (studentId) {
+          if (!studentSubmissions[studentId]) {
+            studentSubmissions[studentId] = []
+          }
+          studentSubmissions[studentId].push(submission)
+        }
+      })
+      
+      return studentSubmissions
+    } catch (error) {
+      console.error("Error grouping submissions by student:", error?.message || error)
+      return {}
+    }
   },
 
   async getByStatus(status) {
     await delay()
-    return submissions
-      .filter(s => s.status === status)
-      .map(s => ({ ...s }))
+    try {
+      const response = await apperClient.fetchRecords('submission_c', {
+        fields: [
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "content_c"}},
+          {"field": {"Name": "files_c"}},
+          {"field": {"Name": "status_c"}},
+          {"field": {"Name": "submitted_at_c"}},
+          {"field": {"Name": "lesson_id_c"}},
+          {"field": {"Name": "student_id_c"}}
+        ],
+        where: [
+          {"FieldName": "status_c", "Operator": "EqualTo", "Values": [status]}
+        ]
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching submissions by status:", response.message)
+        return []
+      }
+      
+      // Parse files JSON string back to array
+      const submissions = (response.data || []).map(submission => ({
+        ...submission,
+        files: submission.files_c ? JSON.parse(submission.files_c) : []
+      }))
+      
+      return submissions
+    } catch (error) {
+      console.error("Error fetching submissions by status:", error?.message || error)
+      return []
+    }
   },
 
   async create(submissionData) {
     await delay()
-    const newSubmission = {
-      Id: Math.max(...submissions.map(s => s.Id)) + 1,
-      ...submissionData,
-      status: "pending",
-      submittedAt: new Date().toISOString()
-    }
-    submissions.push(newSubmission)
-    
-    // Create a task for the coach
-    const newTask = {
-      Id: Math.max(...tasks.map(t => t.Id)) + 1,
-      submissionId: newSubmission.Id,
-      coachId: 2, // Default coach for demo
-      status: "pending",
-      dueDate: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // 48 hours from now
-      priority: "medium"
-    }
-    tasks.push(newTask)
-    
-    return { ...newSubmission }
-  },
-
-  async update(id, submissionData) {
-    await delay()
-    const index = submissions.findIndex(s => s.Id === parseInt(id))
-    if (index === -1) {
-      throw new Error("Submission not found")
-    }
-    submissions[index] = { ...submissions[index], ...submissionData }
-    
-    // Update task status if submission is approved
-    if (submissionData.status === "approved") {
-      const taskIndex = tasks.findIndex(t => t.submissionId === parseInt(id))
-      if (taskIndex !== -1) {
-        tasks[taskIndex].status = "completed"
+    try {
+      const payload = {
+        records: [{
+          Name: `Submission - ${submissionData.lessonId || 'Unknown'}`,
+          content_c: submissionData.content || "",
+          files_c: JSON.stringify(submissionData.files || []),
+          status_c: "pending",
+          submitted_at_c: new Date().toISOString(),
+          lesson_id_c: parseInt(submissionData.lessonId),
+          student_id_c: parseInt(submissionData.studentId)
+        }]
       }
+      
+      const response = await apperClient.createRecord('submission_c', payload)
+      
+      if (!response.success) {
+        console.error("Error creating submission:", response.message)
+        throw new Error(response.message || "Failed to create submission")
+      }
+      
+      let newSubmission
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0]
+        if (!result.success) {
+          console.error("Error creating submission:", result.message)
+          throw new Error(result.message || "Failed to create submission")
+        }
+        
+        // Parse files back to array
+        newSubmission = {
+          ...result.data,
+          files: result.data.files_c ? JSON.parse(result.data.files_c) : []
+        }
+      } else {
+        newSubmission = response.data
+      }
+      
+      // Create a task for the coach (mock data - task_c table not available)
+      const newTask = {
+        Id: Math.max(...tasks.map(t => t.Id), 0) + 1,
+        submissionId: newSubmission.Id,
+        coachId: 2,
+        status: "pending",
+        dueDate: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(),
+        priority: "medium"
+      }
+      tasks.push(newTask)
+      
+      return newSubmission
+    } catch (error) {
+      console.error("Error creating submission:", error?.message || error)
+      throw error
     }
-    
-    return { ...submissions[index] }
   },
 
-  async delete(id) {
+async update(id, submissionData) {
     await delay()
-    const index = submissions.findIndex(s => s.Id === parseInt(id))
-    if (index === -1) {
-      throw new Error("Submission not found")
+    try {
+      const payload = {
+        records: [{
+          Id: parseInt(id)
+        }]
+      }
+      
+      const record = payload.records[0]
+      if (submissionData.content !== undefined) record.content_c = submissionData.content
+      if (submissionData.files !== undefined) record.files_c = JSON.stringify(submissionData.files)
+      if (submissionData.status !== undefined) record.status_c = submissionData.status
+      if (submissionData.submittedAt !== undefined) record.submitted_at_c = submissionData.submittedAt
+      if (submissionData.lessonId !== undefined) record.lesson_id_c = parseInt(submissionData.lessonId)
+      if (submissionData.studentId !== undefined) record.student_id_c = parseInt(submissionData.studentId)
+      
+      const response = await apperClient.updateRecord('submission_c', payload)
+      
+      if (!response.success) {
+        console.error("Error updating submission:", response.message)
+        throw new Error(response.message || "Failed to update submission")
+      }
+      
+      let updatedSubmission
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0]
+        if (!result.success) {
+          console.error("Error updating submission:", result.message)
+          throw new Error(result.message || "Failed to update submission")
+        }
+        
+        // Parse files back to array
+        updatedSubmission = {
+          ...result.data,
+          files: result.data.files_c ? JSON.parse(result.data.files_c) : []
+        }
+      } else {
+        updatedSubmission = response.data
+      }
+      
+      // Update task status if submission is approved (mock data - task_c table not available)
+      if (submissionData.status === "approved") {
+        const taskIndex = tasks.findIndex(t => t.submissionId === parseInt(id))
+        if (taskIndex !== -1) {
+          tasks[taskIndex].status = "completed"
+        }
+      }
+      
+      return updatedSubmission
+    } catch (error) {
+      console.error("Error updating submission:", error?.message || error)
+      throw error
     }
-    const deletedSubmission = submissions.splice(index, 1)[0]
-    return { ...deletedSubmission }
+  },
+
+async delete(id) {
+    await delay()
+    try {
+      const response = await apperClient.deleteRecord('submission_c', {
+        RecordIds: [parseInt(id)]
+      })
+      
+      if (!response.success) {
+        console.error("Error deleting submission:", response.message)
+        throw new Error(response.message || "Failed to delete submission")
+      }
+      
+      if (response.results && response.results.length > 0) {
+        const result = response.results[0]
+        if (!result.success) {
+          console.error("Error deleting submission:", result.message)
+          throw new Error(result.message || "Failed to delete submission")
+        }
+      }
+      
+      return { success: true }
+    } catch (error) {
+      console.error("Error deleting submission:", error?.message || error)
+      throw error
+    }
   }
 }
 
