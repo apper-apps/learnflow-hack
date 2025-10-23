@@ -1,4 +1,5 @@
 [
+[
   {
     "Id": 1,
     "title": "Complete Web Development Bundle",
@@ -58,21 +59,21 @@
     },
     "createdAt": "2024-02-01T09:15:00.000Z",
     "updatedAt": "2024-02-05T16:20:00.000Z"
-},
-  {
-    "Id": 3,
-    "title": "Design Fundamentals Collection",
-    "description": "Learn the basics of graphic design, UI/UX principles, and design thinking methodologies.",
-    "courses": [6, 7, 8],
-    "status": "draft",
-    "pricing": {
+}
+  ],
+    "Id",": 3",
+    "title",":", "Design Fundamentals Collection",
+    "description",":", "Learn the basics of graphic design, UI/UX principles, and design thinking methodologies.",
+    "courses",":", [6, 7, 8],
+    "status",":", "draft",
+    "pricing",":", {
       "type": "monthly_plan",
       "currency": "USD",
       "price": 149.99,
       "monthlyPrice": 24.99,
       "daysUntilExpiry": null
     },
-    "dripSchedule": {
+    "dripSchedule",":", {
       "enabled": true,
       "type": "specific_date",
       "specificDate": "2024-03-01",
@@ -82,13 +83,13 @@
         "8": 28
       }
     },
-    "settings": {
+    "settings",":", {
       "allowCourseSkipping": false,
       "requireSequentialCompletion": true,
       "certificateEnabled": false,
       "discussionEnabled": true
     },
-    "createdAt": "2024-02-10T11:00:00.000Z",
-    "updatedAt": "2024-02-12T13:30:00.000Z"
-  }
+    "createdAt",":", "2024-02-10T11:00:00.000Z",
+    "updatedAt",":", "2024-02-12T13:30:00.000Z"
+  
 ]
