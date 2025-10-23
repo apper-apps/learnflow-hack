@@ -292,11 +292,11 @@ export const moduleService = {
       return response.data || []
     } catch (error) {
       console.error("Error fetching modules:", error?.message || error)
-      throw error
+      return []
     }
   },
 
-async getByCourseId(courseId) {
+  async getByCourseId(courseId) {
     await delay()
     try {
       const response = await apperClient.fetchRecords('module_c', {
@@ -319,7 +319,7 @@ async getByCourseId(courseId) {
       }
       
       return response.data || []
-} catch (error) {
+    } catch (error) {
       console.error("Error fetching modules:", error?.message || error)
       return []
     }

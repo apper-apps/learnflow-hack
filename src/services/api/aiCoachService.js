@@ -1,59 +1,39 @@
-// Helper function for simulating API delay
-const delay = (ms = 300) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = () => new Promise(resolve => setTimeout(resolve, 300))
 
-const { ApperClient } = window.ApperSDK;
-
+// Initialize ApperClient
+const { ApperClient } = window.ApperSDK
 const apperClient = new ApperClient({
   apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
   apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
-});
+})
 
-const TABLE_NAME = 'ai_coach_c';
-
-/**
- * Safely parse JSON string, handling edge cases
- * @param {string|object} value - Value to parse
- * @param {string} fieldName - Field name for logging
- * @returns {Array|Object} Parsed value or empty array
- */
-const safeParseJSON = (value, fieldName = 'knowledge_base_c') => {
-  if (!value) return [];
-  if (typeof value === 'object') return value;
-  if (typeof value !== 'string') return [];
-  
-  try {
-    return JSON.parse(value);
-  } catch (error) {
-    console.warn(`Invalid JSON in ${fieldName}:`, value, error.message);
-    return [];
-  }
-};
 
 export const aiCoachService = {
-  /**
-   * Get all AI coaches
-   */
+  // Get all AI coaches
   async getAll() {
+    await delay()
     try {
-      const params = {
+      const response = await apperClient.fetchRecords('ai_coach_c', {
         fields: [
-          { field: { Name: 'Id' } },
-          { field: { Name: 'name_c' } },
-          { field: { Name: 'description_c' } },
-          { field: { Name: 'personality_traits_c' } },
-          { field: { Name: 'knowledge_base_c' } },
-          { field: { Name: 'is_active_c' } },
-          { field: { Name: 'training_status_c' } },
-          { field: { Name: 'assigned_course_ids_c' } },
-          { field: { Name: 'assigned_bundle_ids_c' } }
-        ],
-        orderBy: [{ fieldName: 'Id', sorttype: 'DESC' }]
-      };
-
-      const response = await apperClient.fetchRecords(TABLE_NAME, params);
+          {"field": {"Name": "Name"}},
+          {"field": {"Name": "name_c"}},
+          {"field": {"Name": "description_c"}},
+          {"field": {"Name": "prompt_c"}},
+          {"field": {"Name": "instructions_c"}},
+          {"field": {"Name": "knowledge_base_c"}},
+          {"field": {"Name": "status_c"}}
+        ]
+      })
+      
+      if (!response.success) {
+        console.error("Error fetching AI coaches:", response.message)
+        return []
+      }
+      
+      // Parse knowledge base JSON string back to array
       const coaches = (response.data || []).map(coach => ({
         ...coach,
-        knowledgeBase: safeParseJSON(coach.knowledge_base_c, 'knowledge_base_c')
+        knowledgeBase: coach.knowledge_base_c ? JSON.parse(coach.knowledge_base_c) : []
       }))
       
       return coaches
@@ -85,9 +65,9 @@ export const aiCoachService = {
       }
       
       // Parse knowledge base JSON string back to array
-const coach = {
+      const coach = {
         ...response.data,
-        knowledgeBase: safeParseJSON(response.data.knowledge_base_c, 'knowledge_base_c')
+        knowledgeBase: response.data.knowledge_base_c ? JSON.parse(response.data.knowledge_base_c) : []
       }
       
       return coach
@@ -128,9 +108,9 @@ const coach = {
         }
         
         // Parse knowledge base back to array
-const coach = {
+        const coach = {
           ...result.data,
-          knowledgeBase: safeParseJSON(result.data.knowledge_base_c, 'knowledge_base_c')
+          knowledgeBase: result.data.knowledge_base_c ? JSON.parse(result.data.knowledge_base_c) : []
         }
         return coach
       }
@@ -175,9 +155,9 @@ const coach = {
         }
         
         // Parse knowledge base back to array
-const coach = {
+        const coach = {
           ...result.data,
-          knowledgeBase: safeParseJSON(result.data.knowledge_base_c, 'knowledge_base_c')
+          knowledgeBase: result.data.knowledge_base_c ? JSON.parse(result.data.knowledge_base_c) : []
         }
         return coach
       }
@@ -242,9 +222,9 @@ const coach = {
       }
       
       // Parse knowledge base JSON string back to array
-const coaches = (response.data || []).map(coach => ({
+      const coaches = (response.data || []).map(coach => ({
         ...coach,
-        knowledgeBase: safeParseJSON(coach.knowledge_base_c, 'knowledge_base_c')
+        knowledgeBase: coach.knowledge_base_c ? JSON.parse(coach.knowledge_base_c) : []
       }))
       
       return coaches
