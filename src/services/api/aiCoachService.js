@@ -34,11 +34,18 @@ export const aiCoachService = {
 const coaches = (response.data || []).map(coach => {
         let knowledgeBase = []
         if (coach.knowledge_base_c) {
-          try {
-            knowledgeBase = JSON.parse(coach.knowledge_base_c)
-          } catch (error) {
-            console.error(`Failed to parse knowledge_base_c for coach ${coach.Id}:`, error, 'Data:', coach.knowledge_base_c)
-            knowledgeBase = []
+          const content = coach.knowledge_base_c.trim()
+          // Check if content looks like JSON (starts with [ or {)
+          if (content.startsWith('[') || content.startsWith('{')) {
+            try {
+              knowledgeBase = JSON.parse(content)
+            } catch (error) {
+              console.error(`Failed to parse knowledge_base_c for coach ${coach.Id}:`, error, 'Invalid JSON content:', content.substring(0, 100))
+              knowledgeBase = []
+            }
+          } else {
+            // Plain text content - treat as single item or skip
+            knowledgeBase = content ? [content] : []
           }
         }
         return {
@@ -78,11 +85,18 @@ const coaches = (response.data || []).map(coach => {
       // Parse knowledge base JSON string back to array
 let knowledgeBase = []
       if (response.data.knowledge_base_c) {
-        try {
-          knowledgeBase = JSON.parse(response.data.knowledge_base_c)
-        } catch (error) {
-          console.error(`Failed to parse knowledge_base_c for coach ${response.data.Id}:`, error, 'Data:', response.data.knowledge_base_c)
-          knowledgeBase = []
+        const content = response.data.knowledge_base_c.trim()
+        // Check if content looks like JSON (starts with [ or {)
+        if (content.startsWith('[') || content.startsWith('{')) {
+          try {
+            knowledgeBase = JSON.parse(content)
+          } catch (error) {
+            console.error(`Failed to parse knowledge_base_c for coach ${response.data.Id}:`, error, 'Invalid JSON content:', content.substring(0, 100))
+            knowledgeBase = []
+          }
+        } else {
+          // Plain text content - treat as single item or skip
+          knowledgeBase = content ? [content] : []
         }
       }
       
