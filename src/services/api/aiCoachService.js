@@ -31,10 +31,21 @@ export const aiCoachService = {
       }
       
       // Parse knowledge base JSON string back to array
-      const coaches = (response.data || []).map(coach => ({
-        ...coach,
-        knowledgeBase: coach.knowledge_base_c ? JSON.parse(coach.knowledge_base_c) : []
-      }))
+const coaches = (response.data || []).map(coach => {
+        let knowledgeBase = []
+        if (coach.knowledge_base_c) {
+          try {
+            knowledgeBase = JSON.parse(coach.knowledge_base_c)
+          } catch (error) {
+            console.error(`Failed to parse knowledge_base_c for coach ${coach.Id}:`, error, 'Data:', coach.knowledge_base_c)
+            knowledgeBase = []
+          }
+        }
+        return {
+          ...coach,
+          knowledgeBase
+        }
+      })
       
       return coaches
     } catch (error) {
@@ -65,9 +76,19 @@ export const aiCoachService = {
       }
       
       // Parse knowledge base JSON string back to array
+let knowledgeBase = []
+      if (response.data.knowledge_base_c) {
+        try {
+          knowledgeBase = JSON.parse(response.data.knowledge_base_c)
+        } catch (error) {
+          console.error(`Failed to parse knowledge_base_c for coach ${response.data.Id}:`, error, 'Data:', response.data.knowledge_base_c)
+          knowledgeBase = []
+        }
+      }
+      
       const coach = {
         ...response.data,
-        knowledgeBase: response.data.knowledge_base_c ? JSON.parse(response.data.knowledge_base_c) : []
+        knowledgeBase
       }
       
       return coach
