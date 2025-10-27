@@ -312,12 +312,12 @@ function getCoachName(ownerId) {
                         <div className="flex items-center space-x-2">
                           <ApperIcon name="ExternalLink" size={16} className="text-primary-500" />
                           <a 
-                            href={`/course/${course.courseUrl}`}
+href={`/course/${course.courseUrl}`}
                             className="text-sm text-primary-600 hover:text-primary-700 font-medium underline"
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            {course.courseUrl}
+                            {course.courseUrl || 'Not set'}
                           </a>
                         </div>
                       ) : (

@@ -158,8 +158,8 @@ const handleSaveCourse = async (isDraft = false) => {
       }
 
       // Generate course path for hyperlink if not set
-      if (!isDraft && !courseData.settings.hyperlink.coursePath) {
-        const coursePath = courseData.title
+if (!isDraft && !courseData.settings.hyperlink.coursePath) {
+        const coursePath = (courseData.title || '')
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-+|-+$/g, '')
@@ -175,7 +175,7 @@ const handleSaveCourse = async (isDraft = false) => {
         }))
       }
 
-      let savedCourse
+let savedCourse
       const courseDataToSave = {
         ...courseData,
         settings: {
@@ -183,7 +183,7 @@ const handleSaveCourse = async (isDraft = false) => {
           hyperlink: {
             ...courseData.settings.hyperlink,
             coursePath: courseData.settings.hyperlink.coursePath || 
-              courseData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+              (courseData.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
           }
         }
       }
