@@ -7,7 +7,6 @@ const apperClient = new ApperClient({
   apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
 })
 
-
 export const courseService = {
   async getAll() {
     await delay()
@@ -137,7 +136,7 @@ export const courseService = {
     }
   },
 
-async update(id, courseData) {
+  async update(id, courseData) {
     await delay()
     try {
       const payload = {
@@ -194,7 +193,7 @@ async update(id, courseData) {
     }
   },
 
-async generateCourseUrl(id, courseTitle) {
+  async generateCourseUrl(id, courseTitle) {
     await delay()
     try {
       // Generate URL slug from course title
@@ -215,7 +214,7 @@ async generateCourseUrl(id, courseTitle) {
     }
   },
 
-async delete(id) {
+  async delete(id) {
     await delay()
     try {
       const response = await apperClient.deleteRecord('course_c', {
@@ -242,7 +241,7 @@ async delete(id) {
     }
   },
 
-async getCourseStructure(courseId) {
+  async getCourseStructure(courseId) {
     await delay()
     try {
       const course = await this.getById(courseId)
@@ -271,35 +270,10 @@ async getCourseStructure(courseId) {
 }
 
 export const moduleService = {
-  async getAll() {
-    await delay()
-    try {
-      const response = await apperClient.fetchRecords('module_c', {
-        fields: [
-          {"field": {"Name": "Name"}},
-          {"field": {"Name": "title_c"}},
-          {"field": {"Name": "description_c"}},
-          {"field": {"Name": "order_index_c"}},
-          {"field": {"Name": "course_id_c"}}
-        ]
-      })
-      
-      if (!response.success) {
-        console.error("Error fetching modules:", response.message)
-        return []
-      }
-      
-      return response.data || []
-    } catch (error) {
-      console.error("Error fetching modules:", error?.message || error)
-      return []
-    }
-  },
-
   async getByCourseId(courseId) {
     await delay()
     try {
-      const response = await apperClient.fetchRecords('module_c', {
+const response = await apperClient.fetchRecords('module_c', {
         fields: [
           {"field": {"Name": "Name"}},
           {"field": {"Name": "title_c"}},
