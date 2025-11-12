@@ -303,8 +303,8 @@ const response = await apperClient.fetchRecords('module_c', {
     await delay()
     try {
       const payload = {
-        records: [{
-          Name: moduleData.title || "Untitled Module",
+records: [{
+          Name: moduleData.Name || moduleData.title || "Untitled Module",
           title_c: moduleData.title || "",
           description_c: moduleData.description || "",
           order_index_c: moduleData.orderIndex || 0,

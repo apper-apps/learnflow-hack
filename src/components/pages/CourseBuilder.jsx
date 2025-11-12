@@ -269,7 +269,7 @@ let savedCourse
     setAutoSaveTimer(timer)
   }
 
-  const handleAddModule = async () => {
+const handleAddModule = async () => {
     try {
       if (!isEditing) {
         toast.error("Please save the course first")
@@ -278,7 +278,7 @@ let savedCourse
 
       const newModule = await moduleService.create({
         courseId: parseInt(courseId),
-        title: "New Module",
+        Name: "New Module",
         orderIndex: modules.length + 1
       })
 
@@ -290,11 +290,11 @@ let savedCourse
     }
   }
 
-  const handleUpdateModule = async (moduleId, title) => {
+const handleUpdateModule = async (moduleId, title) => {
     try {
-      await moduleService.update(moduleId, { title })
+      await moduleService.update(moduleId, { Name: title })
       setModules(modules.map(m => 
-        m.Id === moduleId ? { ...m, title } : m
+        m.Id === moduleId ? { ...m, title, Name: title } : m
       ))
     } catch (err) {
       toast.error("Failed to update module: " + err.message)
